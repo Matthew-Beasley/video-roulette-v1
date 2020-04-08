@@ -76,9 +76,9 @@ app.get("/session", function (req, res) {
  * GET /room/:name
  */
 app.get("/room/:name", function (req, res) {
-  var roomName = req.params.name;
-  var sessionId;
-  var token;
+  const roomName = req.params.name;
+  let sessionId;
+  let token;
   console.log(
     "attempting to create a session associated with the room: " + roomName
   );
@@ -126,116 +126,114 @@ app.get("/room/:name", function (req, res) {
 /**
  * POST /archive/start
  */
-app.post("/archive/start", function (req, res) {
-  var json = req.body;
-  var sessionId = json.sessionId;
-  opentok.startArchive(
-    sessionId,
-    { name: findRoomFromSessionId(sessionId) },
-    function (err, archive) {
-      if (err) {
-        console.error("error in startArchive");
-        console.error(err);
-        res.status(500).send({ error: "startArchive error:" + err });
-        return;
-      }
-      res.setHeader("Content-Type", "application/json");
-      res.send(archive);
-    }
-  );
-});
+// app.post("/archive/start", function (req, res) {
+//   var json = req.body;
+//   var sessionId = json.sessionId;
+//   opentok.startArchive(
+//     sessionId,
+//     { name: findRoomFromSessionId(sessionId) },
+//     function (err, archive) {
+//       if (err) {
+//         console.error("error in startArchive");
+//         console.error(err);
+//         res.status(500).send({ error: "startArchive error:" + err });
+//         return;
+//       }
+//       res.setHeader("Content-Type", "application/json");
+//       res.send(archive);
+//     }
+//   );
+// });
 
 /**
  * POST /archive/:archiveId/stop
  */
-app.post("/archive/:archiveId/stop", function (req, res) {
-  var archiveId = req.params.archiveId;
-  console.log("attempting to stop archive: " + archiveId);
-  opentok.stopArchive(archiveId, function (err, archive) {
-    if (err) {
-      console.error("error in stopArchive");
-      console.error(err);
-      res.status(500).send({ error: "stopArchive error:" + err });
-      return;
-    }
-    res.setHeader("Content-Type", "application/json");
-    res.send(archive);
-  });
-});
+// app.post("/archive/:archiveId/stop", function (req, res) {
+//   var archiveId = req.params.archiveId;
+//   console.log("attempting to stop archive: " + archiveId);
+//   opentok.stopArchive(archiveId, function (err, archive) {
+//     if (err) {
+//       console.error("error in stopArchive");
+//       console.error(err);
+//       res.status(500).send({ error: "stopArchive error:" + err });
+//       return;
+//     }
+//     res.setHeader("Content-Type", "application/json");
+//     res.send(archive);
+//   });
+// });
 
 /**
  * GET /archive/:archiveId/view
  */
-app.get("/archive/:archiveId/view", function (req, res) {
-  var archiveId = req.params.archiveId;
-  console.log("attempting to view archive: " + archiveId);
-  opentok.getArchive(archiveId, function (err, archive) {
-    if (err) {
-      console.error("error in getArchive");
-      console.error(err);
-      res.status(500).send({ error: "getArchive error:" + err });
-      return;
-    }
+// app.get("/archive/:archiveId/view", function (req, res) {
+//   var archiveId = req.params.archiveId;
+//   console.log("attempting to view archive: " + archiveId);
+//   opentok.getArchive(archiveId, function (err, archive) {
+//     if (err) {
+//       console.error("error in getArchive");
+//       console.error(err);
+//       res.status(500).send({ error: "getArchive error:" + err });
+//       return;
+//     }
 
-    if (archive.status === "available") {
-      res.redirect(archive.url);
-    } else {
-      res.render("view", { title: "Archiving Pending" });
-    }
-  });
-});
+//     if (archive.status === "available") {
+//       res.redirect(archive.url);
+//     } else {
+//       res.render("view", { title: "Archiving Pending" });
+//     }
+//   });
+// });
 
 /**
  * GET /archive/:archiveId
  */
-app.get("/archive/:archiveId", function (req, res) {
-  var archiveId = req.params.archiveId;
+// app.get("/archive/:archiveId", function (req, res) {
+//   var archiveId = req.params.archiveId;
 
-  // fetch archive
-  console.log("attempting to fetch archive: " + archiveId);
-  opentok.getArchive(archiveId, function (err, archive) {
-    if (err) {
-      console.error("error in getArchive");
-      console.error(err);
-      res.status(500).send({ error: "getArchive error:" + err });
-      return;
-    }
+//   // fetch archive
+//   console.log("attempting to fetch archive: " + archiveId);
+//   opentok.getArchive(archiveId, function (err, archive) {
+//     if (err) {
+//       console.error("error in getArchive");
+//       console.error(err);
+//       res.status(500).send({ error: "getArchive error:" + err });
+//       return;
+//     }
 
-    // extract as a JSON object
-    res.setHeader("Content-Type", "application/json");
-    res.send(archive);
-  });
-});
+//     // extract as a JSON object
+//     res.setHeader("Content-Type", "application/json");
+//     res.send(archive);
+//   });
+// });
 
 /**
  * GET /archive
  */
-app.get("/archive", function (req, res) {
-  var options = {};
-  if (req.query.count) {
-    options.count = req.query.count;
-  }
-  if (req.query.offset) {
-    options.offset = req.query.offset;
-  }
+// app.get("/archive", function (req, res) {
+//   var options = {};
+//   if (req.query.count) {
+//     options.count = req.query.count;
+//   }
+//   if (req.query.offset) {
+//     options.offset = req.query.offset;
+//   }
 
-  // list archives
-  console.log("attempting to list archives");
-  opentok.listArchives(options, function (err, archives) {
-    if (err) {
-      console.error("error in listArchives");
-      console.error(err);
-      res.status(500).send({ error: "infoArchive error:" + err });
-      return;
-    }
+// list archives
+// console.log("attempting to list archives");
+// opentok.listArchives(options, function (err, archives) {
+//   if (err) {
+//     console.error("error in listArchives");
+//     console.error(err);
+//     res.status(500).send({ error: "infoArchive error:" + err });
+//     return;
+//   }
 
-    // extract as a JSON object
-    res.setHeader("Content-Type", "application/json");
-    res.send(archives);
-  });
-});
-
-module.exports = app;
+// extract as a JSON object
+//     res.setHeader("Content-Type", "application/json");
+//     res.send(archives);
+//   });
+// });
 
 //maybe rethink this error handling
 app.use((req, res, next) => {

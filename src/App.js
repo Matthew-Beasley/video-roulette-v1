@@ -1,13 +1,15 @@
+/* eslint-disable react/self-closing-comp */
 /* eslint-disable react/button-has-type */
 import React, { useEffect } from "react";
 import useOpenTok from "react-use-opentok";
+import axios from "axios";
 
 //this should come from server
-const apiKey = 46648222;
-const sessionId =
-  "2_MX40NjY0ODIyMn5-MTU4NjI5ODk4NDk3Nn5jWDlpeVFJN3N0enFLZUhNNWEzRTNGMnB-fg";
-const token =
-  "T1==cGFydG5lcl9pZD00NjY0ODIyMiZzaWc9ZDBiOWRjMDQxMmM0ZGNkZDliODI3YWQ4ZDQ2YWJjZmZhY2ZhYTFkYTpzZXNzaW9uX2lkPTJfTVg0ME5qWTBPREl5TW41LU1UVTROakk1T0RrNE5EazNObjVqV0RscGVWRkpOM04wZW5GTFpVaE5OV0V6UlROR01uQi1mZyZjcmVhdGVfdGltZT0xNTg2Mjk5MDAzJm5vbmNlPTAuMTkyNzAyNzQwNDAzOTc3NiZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNTg2Mzg1NDAyJmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
+const roomname = Math.ceil(Math.random() * 10000000000);
+
+let apiKey;
+let sessionId;
+let token;
 
 const App = () => {
   const [opentokProps, opentokMethods] = useOpenTok();
@@ -17,13 +19,30 @@ const App = () => {
   const { initSessionAndConnect, publish, subscribe } = opentokMethods;
 
   //  built out should fetch session ID and token from server
-  useEffect(() => {
-    initSessionAndConnect({
-      apiKey,
-      sessionId,
-      token,
-    });
-  }, [initSessionAndConnect]);
+  const createSession = async () => {
+    try {
+      const response = await axios.get(`/room/${roomname}`);
+      apiKey = response.data.apiKey;
+      sessionId = response.data.sessionId;
+      token = response.data.token;
+      initSessionAndConnect({
+        apiKey,
+        sessionId,
+        token,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // useEffect(() => {
+  //   initSessionAndConnect({
+  //     apiKey,
+  //     sessionId,
+  //     token,
+  //   });
+  // }, [initSessionAndConnect]);
   console.log("session", session);
 
   return (
@@ -34,8 +53,15 @@ const App = () => {
         </div>
         <div id="subscriber" />
       </div>
+      <button
+        onClick={() => {
+          createSession();
+        }}
+      >
+        create session
+      </button>
       {session && publish && (
-        <>
+        <div>
           <button
             onClick={() => {
               publish({
@@ -67,7 +93,7 @@ const App = () => {
           >
             Publish Screen
           </button>
-        </>
+        </div>
       )}
 
       <div>
