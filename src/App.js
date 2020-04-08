@@ -4,14 +4,15 @@ import React, { useEffect } from "react";
 import useOpenTok from "react-use-opentok";
 import axios from "axios";
 
-//this should come from server
-const roomname = Math.ceil(Math.random() * 10000000000);
-
-let apiKey;
-let sessionId;
-let token;
 
 const App = () => {
+  //this should come from server
+  const roomname = Math.ceil(Math.random() * 10000000000);
+
+  let apiKey;
+  let sessionId;
+  let token;
+
   const [opentokProps, opentokMethods] = useOpenTok();
 
   const { isSessionConnected, session, streams } = opentokProps;
@@ -36,6 +37,31 @@ const App = () => {
     }
   };
 
+  const publishCamera = () => {
+    publish({
+      name: "camera",
+      element: "me",
+      options: {
+        insertMode: "replace",
+        width: "180px",
+        height: "120px",
+      },
+    });
+  }
+
+  const publishScreen = () => {
+    publish({
+      name: "screen",
+      element: "me",
+      options: {
+        insertMode: "replace",
+        width: "180px",
+        height: "120px",
+        videoSource: "screen",
+      },
+    });
+  }
+
   // useEffect(() => {
   //   initSessionAndConnect({
   //     apiKey,
@@ -53,49 +79,19 @@ const App = () => {
         </div>
         <div id="subscriber" />
       </div>
-      <button
-        onClick={() => {
-          createSession();
-        }}
-      >
+      <button onClick={() => createSession()}>
         create session
       </button>
       {session && publish && (
         <div>
-          <button
-            onClick={() => {
-              publish({
-                name: "camera",
-                element: "me",
-                options: {
-                  insertMode: "replace",
-                  width: "180px",
-                  height: "120px",
-                },
-              });
-            }}
-          >
+          <button onClick={() => publishCamera()}>
             Publish Camera
           </button>
-          <button
-            onClick={() => {
-              publish({
-                name: "screen",
-                element: "me",
-                options: {
-                  insertMode: "replace",
-                  width: "180px",
-                  height: "120px",
-                  videoSource: "screen",
-                },
-              });
-            }}
-          >
+          <button onClick={() => publishScreen()}>
             Publish Screen
           </button>
         </div>
       )}
-
       <div>
         <ul>
           {streams.map((stream) => (
