@@ -31,6 +31,8 @@
     "express": "^4.17.1",
     "faker": "^4.1.0",
     "jest": "^25.2.7",
+    "lodash": "^4.17.15",
+    "opentok": "^2.9.2",
     "pg": "^8.0.0",
     "react-use-opentok": "^2.2.3"
   }
