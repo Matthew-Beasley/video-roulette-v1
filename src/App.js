@@ -18,14 +18,13 @@ const App = () => {
   const { initSessionAndConnect, publish, subscribe } = opentokMethods;
   let roomToSessionIdDictionary;
 
-
   const getRoomToSessionIdDictionary = async () => {
     try {
       return await axios.get("/allsessions");
     } catch (error) {
       console.log(new Error(error));
     }
-  }
+  };
 
   //  built out should fetch session ID and token from server
   const createSession = async () => {
@@ -49,7 +48,7 @@ const App = () => {
     }
   };
 
-//maybe provide a control so creator can set max participants?
+  //maybe provide a control so creator can set max participants?
   const createNewSession = async () => {
     const roomToSession = await getRoomToSessionIdDictionary();
     const roomKeys = Object.keys(roomToSession.data);
@@ -66,8 +65,7 @@ const App = () => {
     console.log("roomKeys: ", roomKeys);
     roomname = Math.floor(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
     createSession();
-  }
-
+  };
 
   const publishCamera = () => {
     publish({
@@ -82,7 +80,6 @@ const App = () => {
     console.log("streams: ", streams);
   };
 
-
   const publishScreen = () => {
     publish({
       name: "screen",
@@ -96,7 +93,6 @@ const App = () => {
     });
   };
 
-
   return (
     <div id="container">
       <div id="players">
@@ -108,10 +104,10 @@ const App = () => {
       <button onClick={() => createNewSession()}>Create New Session</button>
       <button onClick={() => joinRandomSession()}>Join Random Session</button>
 
-        <div>
-          <button onClick={() => publishCamera()}>Publish Camera</button>
-          <button onClick={() => publishScreen()}>Publish Screen</button>
-        </div>
+      <div>
+        <button onClick={() => publishCamera()}>Publish Camera</button>
+        <button onClick={() => publishScreen()}>Publish Screen</button>
+      </div>
 
       <div>
         <ul>
