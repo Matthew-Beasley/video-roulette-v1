@@ -72,6 +72,10 @@ app.get("/session", function (req, res) {
   res.redirect("/room/session");
 });
 
+app.get("/allsessions", (req, res, next) => {
+  res.send(roomToSessionIdDictionary);
+})
+
 /**
  * GET /room/:name
  */
@@ -79,13 +83,19 @@ app.get("/room/:name", function (req, res) {
   const roomName = req.params.name;
   let sessionId;
   let token;
-  console.log(
+  /*console.log(
     "attempting to create a session associated with the room: " + roomName
-  );
+  );*/
 
   // if the room name is associated with a session ID, fetch that
   if (roomToSessionIdDictionary[roomName]) {
     sessionId = roomToSessionIdDictionary[roomName];
+
+    if (sessionId) {
+      console.log("Fetching existing session: ", sessionId);//.substring(0, 5));
+      console.log("room name is: ", roomName);
+      console.log("");
+    }
 
     // generate token
     token = opentok.generateToken(sessionId);
@@ -105,11 +115,16 @@ app.get("/room/:name", function (req, res) {
         return;
       }
 
-      // now that the room name has a session associated wit it, store it in memory
+      // now that the room name has a session associated with it, store it in memory
       // IMPORTANT: Because this is stored in memory, restarting your server will reset these values
       // if you want to store a room-to-session association in your production application
       // you should use a more persistent storage for them
       roomToSessionIdDictionary[roomName] = session.sessionId;
+      if (sessionId) {
+        console.log("create a new session ID: ", session.sessionId)//.substring(0, 5));
+        console.log("room name is: ", roomName);
+        console.log("");
+      }
 
       // generate token
       token = opentok.generateToken(session.sessionId);
