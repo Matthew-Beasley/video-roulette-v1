@@ -4,46 +4,98 @@ import React, { useEffect } from "react";
 import useOpenTok from "react-use-opentok";
 import axios from "axios";
 
-//this should come from server
-const roomname = Math.ceil(Math.random() * 10000000000);
-
-let apiKey;
-let sessionId;
-let token;
-
 const App = () => {
+  //this should come from server
+  //let roomname;//Math.ceil(Math.random() * 10000000000);
+
+  let apiKey;
+  let sessionId;
+  let token;
+  let roomname = 1;
+
   const [opentokProps, opentokMethods] = useOpenTok();
-
   const { isSessionConnected, session, streams } = opentokProps;
-
   const { initSessionAndConnect, publish, subscribe } = opentokMethods;
+  let roomToSessionIdDictionary;
+
+
+  const getRoomToSessionIdDictionary = async () => {
+    try {
+      return await axios.get("/allsessions");
+    } catch (error) {
+      console.log(new Error(error));
+    }
+  }
 
   //  built out should fetch session ID and token from server
   const createSession = async () => {
-    try {
-      const response = await axios.get(`/room/${roomname}`);
+    console.log("roomname is: ", roomname);
+    const response = await axios.get(`/room/${roomname}`);
+
+    if (!response) {
+      return new Error("Call to /room/:roomname failed");
+    } else {
       apiKey = response.data.apiKey;
       sessionId = response.data.sessionId;
       token = response.data.token;
-      initSessionAndConnect({
-        apiKey,
-        sessionId,
-        token,
-      });
-      console.log(response);
-    } catch (error) {
-      console.log(error);
+    }
+    const promise = await initSessionAndConnect({
+      apiKey,
+      sessionId,
+      token,
+    });
+    if (promise !== undefined) {
+      return new Error("Session initialization and/or connection failed");
     }
   };
 
-  // useEffect(() => {
-  //   initSessionAndConnect({
-  //     apiKey,
-  //     sessionId,
-  //     token,
-  //   });
-  // }, [initSessionAndConnect]);
-  console.log("session", session);
+//maybe provide a control so creator can set max participants?
+  const createNewSession = async () => {
+    const roomToSession = await getRoomToSessionIdDictionary();
+    const roomKeys = Object.keys(roomToSession.data);
+    console.log("roomToSession: ", roomToSession);
+    console.log("roomKeys: ", roomKeys);
+    roomname = roomKeys.length + 1;
+    createSession();
+  };
+
+  const joinRandomSession = async () => {
+    const roomToSession = await getRoomToSessionIdDictionary();
+    const roomKeys = Object.keys(roomToSession.data);
+    console.log("roomToSession: ", roomToSession);
+    console.log("roomKeys: ", roomKeys);
+    roomname = Math.floor(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
+    createSession();
+  }
+
+
+  const publishCamera = () => {
+    publish({
+      name: "camera",
+      element: "me",
+      options: {
+        insertMode: "replace",
+        width: "180px",
+        height: "120px",
+      },
+    });
+    console.log("streams: ", streams);
+  };
+
+
+  const publishScreen = () => {
+    publish({
+      name: "screen",
+      element: "me",
+      options: {
+        insertMode: "replace",
+        width: "180px",
+        height: "120px",
+        videoSource: "screen",
+      },
+    });
+  };
+
 
   return (
     <div id="container">
@@ -53,48 +105,13 @@ const App = () => {
         </div>
         <div id="subscriber" />
       </div>
-      <button
-        onClick={() => {
-          createSession();
-        }}
-      >
-        create session
-      </button>
-      {session && publish && (
+      <button onClick={() => createNewSession()}>Create New Session</button>
+      <button onClick={() => joinRandomSession()}>Join Random Session</button>
+
         <div>
-          <button
-            onClick={() => {
-              publish({
-                name: "camera",
-                element: "me",
-                options: {
-                  insertMode: "replace",
-                  width: "180px",
-                  height: "120px",
-                },
-              });
-            }}
-          >
-            Publish Camera
-          </button>
-          <button
-            onClick={() => {
-              publish({
-                name: "screen",
-                element: "me",
-                options: {
-                  insertMode: "replace",
-                  width: "180px",
-                  height: "120px",
-                  videoSource: "screen",
-                },
-              });
-            }}
-          >
-            Publish Screen
-          </button>
+          <button onClick={() => publishCamera()}>Publish Camera</button>
+          <button onClick={() => publishScreen()}>Publish Screen</button>
         </div>
-      )}
 
       <div>
         <ul>
