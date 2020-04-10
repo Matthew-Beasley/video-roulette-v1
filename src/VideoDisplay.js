@@ -11,10 +11,32 @@ const VideoDisplay = () => {
   let token;
   let roomname = 1;
 
+  //Clean all this up, we should grab props and then destructure where we need the methods
   const [opentokProps, opentokMethods] = useOpenTok();
-  const { isSessionConnected, session, streams } = opentokProps;
-  const { initSessionAndConnect, publish, subscribe } = opentokMethods;
-  let roomToSessionIdDictionary;
+
+  const {
+    // connection info
+    isSessionInitialized,
+    connectionId,
+    isSessionConnected,
+
+    // connected data
+    session,
+    connections,
+    streams,
+    subscribers,
+    publisher,
+  } = opentokProps;
+
+  const {
+    initSessionAndConnect,
+    disconnectSession,
+    publish,
+    unpublish,
+    subscribe,
+    unsubscribe,
+    sendSignal,
+  } = opentokMethods;
 
   const getRoomToSessionIdDictionary = async () => {
     try {
@@ -83,6 +105,8 @@ const VideoDisplay = () => {
         height: "120px",
       },
     });
+    publisher["camera"] = "camera";
+    console.log(publisher)
     console.log("streams: ", streams);
   };
 
@@ -99,6 +123,17 @@ const VideoDisplay = () => {
     });
   };
 
+  const disconnectFromSession = () => {
+    disconnectSession();
+  }
+
+  const Unpublish = () => {
+    console.log(publisher)
+    publisher.camera = "";
+    unpublish({ name: "camera" });
+    publisher["camera"]  = "";
+  }
+
   return (
     <div>
       <div id="players">
@@ -109,6 +144,8 @@ const VideoDisplay = () => {
       </div>
       <button onClick={() => createNewSession()}>Create New Session</button>
       <button onClick={() => joinRandomSession()}>Join Random Session</button>
+      <button onClick={() => disconnectFromSession()}>Disconnect</button>
+      <button onClick={() => Unpublish()}>Unpublish</button>
 
       <div>
         <button onClick={() => publishCamera()}>Publish Camera</button>
