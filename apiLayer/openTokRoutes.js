@@ -44,6 +44,21 @@ function findRoomFromSessionId(sessionId) {
   });
 }
 
+const findAvailableRoom = (roomName) => {
+  const candidateRooms = Object.keys(roomToSessionIdDictionary);
+  const availableRoom = candidateRooms.reduce((acc, candidate) => {
+    if (roomToSessionIdDictionary[candidate].connectionCount < 2) {
+      acc = candidate;
+    }
+    return candidate;
+  }, 0);
+  if (availableRoom !== 0) {
+    return availableRoom;
+  } else {
+    return roomName;
+  }
+}
+
 /**
  * GET /session redirects to /room/session
  */
@@ -75,9 +90,14 @@ openTokRouter.get("/room/:name", function (req, res) {
     "attempting to create a session associated with the room: " + roomName
   );
 
-  // if the room name is associated with a session ID, fetch that
-  // if (roomToSessionIdDictionary[roomName]) {
-  //   sessionId = roomToSessionIdDictionary[roomName];
+  // if the room name is associated with a session ID, check number of occupants
+  if (roomToSessionIdDictionary[roomName] &&
+    roomToSessionIdDictionary[roomName].connectionCount >= 2) {
+    // if our room isn't available, try to find one
+    roomName = findAvailableRoom(roomName);
+  }
+
+  // we should now have an available room, if not drop down to create a room
   if (roomToSessionIdDictionary[roomName] &&
       roomToSessionIdDictionary[roomName].connectionCount < 2) {
 
@@ -94,9 +114,7 @@ openTokRouter.get("/room/:name", function (req, res) {
       token: token,
       dictionary: roomToSessionIdDictionary,
     });
-  }
-  // if this is the first time the room is being accessed, create a new session ID
-  else {
+  } else { // ithis is the first time the room is being accessed, create a new session ID
     opentok.createSession({ mediaMode: "routed" }, function (err, session) {
       console.log("this is in create session", roomToSessionIdDictionary);
       if (err) {
