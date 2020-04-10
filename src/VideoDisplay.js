@@ -23,6 +23,11 @@ const VideoDisplay = () => {
     }
   };
 
+  // const getStreams = async (sessionId) => {
+  //   const response = await axios.get(`/streams/${sessionId}`);
+  //   return response;
+  // };
+
   //  built out should fetch session ID and token from server
   const createSession = async () => {
     console.log("roomname is: ", roomname);
@@ -53,6 +58,7 @@ const VideoDisplay = () => {
     console.log("roomKeys: ", roomKeys);
     roomname = roomKeys.length + 1;
     createSession();
+    console.log(roomToSession);
   };
 
   const joinRandomSession = async () => {
@@ -60,7 +66,7 @@ const VideoDisplay = () => {
     const roomKeys = Object.keys(roomToSession.data);
     console.log("roomToSession: ", roomToSession);
     console.log("roomKeys: ", roomKeys);
-    roomname = Math.floor(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
+    roomname = Math.ceil(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
     createSession();
   };
 

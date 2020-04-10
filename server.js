@@ -6,6 +6,7 @@ const { buildDB } = require("./dataLayer/modelsIndex");
 const { apiRouter } = require("./apiLayer/apiRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const axios = require("axios");
 
 app.use(cors());
 app.use(express.json());
@@ -68,34 +69,44 @@ function findRoomFromSessionId(sessionId) {
 /**
  * GET /session redirects to /room/session
  */
-app.get("/session", function (req, res) {
+app.get("/session", function (req, res, next) {
   res.redirect("/room/session");
 });
 
 app.get("/allsessions", (req, res, next) => {
   res.send(roomToSessionIdDictionary);
-})
+});
+
+// app.get("/streams/:sessionId", async (req, res, next) => {
+//   const { sessionId } = req.params;
+//   const response = await axios.get(
+//     `https://api.opentok.com/v2/project/${apiKey}/session/${sessionId}/stream/`
+//   );
+//   res.send(response.data);
+// });
 
 /**
  * GET /room/:name
  */
 app.get("/room/:name", function (req, res) {
-  const roomName = req.params.name;
+  let roomName = req.params.name;
+
   let sessionId;
   let token;
-  /*console.log(
+  console.log(
     "attempting to create a session associated with the room: " + roomName
-  );*/
+  );
 
   // if the room name is associated with a session ID, fetch that
-  if (roomToSessionIdDictionary[roomName]) {
-    sessionId = roomToSessionIdDictionary[roomName];
-
-    if (sessionId) {
-      console.log("Fetching existing session: ", sessionId);//.substring(0, 5));
-      console.log("room name is: ", roomName);
-      console.log("");
-    }
+  // if (roomToSessionIdDictionary[roomName]) {
+  //   sessionId = roomToSessionIdDictionary[roomName];
+  if (
+    roomToSessionIdDictionary[roomName] &&
+    roomToSessionIdDictionary[roomName].connectionCount < 2
+  ) {
+    console.log("this is in the if logic: ", roomToSessionIdDictionary);
+    roomToSessionIdDictionary[roomName].connectionCount++;
+    sessionId = roomToSessionIdDictionary[roomName].sessionId;
 
     // generate token
     token = opentok.generateToken(sessionId);
@@ -104,27 +115,27 @@ app.get("/room/:name", function (req, res) {
       apiKey: apiKey,
       sessionId: sessionId,
       token: token,
+      dictionary: roomToSessionIdDictionary,
     });
   }
   // if this is the first time the room is being accessed, create a new session ID
   else {
     opentok.createSession({ mediaMode: "routed" }, function (err, session) {
+      console.log("this is in create session", roomToSessionIdDictionary);
       if (err) {
         console.log(err);
         res.status(500).send({ error: "createSession error:" + err });
         return;
       }
 
-      // now that the room name has a session associated with it, store it in memory
+      // now that the room name has a session associated wit it, store it in memory
       // IMPORTANT: Because this is stored in memory, restarting your server will reset these values
       // if you want to store a room-to-session association in your production application
       // you should use a more persistent storage for them
-      roomToSessionIdDictionary[roomName] = session.sessionId;
-      if (sessionId) {
-        console.log("create a new session ID: ", session.sessionId)//.substring(0, 5));
-        console.log("room name is: ", roomName);
-        console.log("");
-      }
+      roomToSessionIdDictionary[roomName] = {
+        sessionId: session.sessionId,
+        connectionCount: 1,
+      };
 
       // generate token
       token = opentok.generateToken(session.sessionId);
@@ -133,6 +144,7 @@ app.get("/room/:name", function (req, res) {
         apiKey: apiKey,
         sessionId: session.sessionId,
         token: token,
+        dictionary: roomToSessionIdDictionary,
       });
     });
   }
@@ -259,7 +271,8 @@ app.use((req, res, next) => {
 });
 app.use((err, req, res, next) => {
   res.status(err.status || 500).send({
-    message: err.message || JSON.stringify(err),
+    // message: "piggly wiggly" || err.message || JSON.stringify(err),
+    message: "piggly wiggly",
   });
 });
 
