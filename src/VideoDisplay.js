@@ -105,7 +105,9 @@ const VideoDisplay = () => {
         height: "120px",
       },
     });
-    publisher["camera"] = "camera";
+    publisher.name = "camera";
+    publisher.camera = "camera";
+    publisher._ = "camera";
     console.log(publisher)
     console.log("streams: ", streams);
   };
@@ -127,11 +129,12 @@ const VideoDisplay = () => {
     disconnectSession();
   }
 
-  const Unpublish = () => {
+  const Unpublish = async () => {
     console.log(publisher)
+    const resp = await unpublish({ name: "camera" });
+    console.log("response from unpublish is: ", resp)
+    publisher.name = "";
     publisher.camera = "";
-    unpublish({ name: "camera" });
-    publisher["camera"]  = "";
   }
 
   return (
