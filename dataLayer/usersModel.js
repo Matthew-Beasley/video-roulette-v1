@@ -1,18 +1,26 @@
 /* eslint-disable guard-for-in */
-const { client } = require('./client');
+const { client } = require("./client");
 
-const createUser = async ({ userName, firstName, lastName, password }) => {
+const createUser = async ({
+  userName,
+  firstName,
+  lastName,
+  email,
+  password,
+}) => {
   const sql = `
-  INSERT INTO users ("userName", "firstName", "lastName", password)
-  VALUES ($1, $2, $3, $4)
+  INSERT INTO users ("userName", "firstName", "lastName", email, password)
+  VALUES ($1, $2, $3, $4, $5)
   RETURNING *;`;
-  return (await client.query(sql, [userName, firstName, lastName, password])).rows[0];
-}
+  return (
+    await client.query(sql, [userName, firstName, lastName, email, password])
+  ).rows[0];
+};
 
 const readUsers = async () => {
   const sql = "SELECT * FROM users";
   return (await client.query(sql)).rows;
-}
+};
 
 const updateUser = async (request) => {
   let set = "SET";
@@ -42,11 +50,11 @@ const deleteUser = async ({ userName }) => {
   DELETE FROM users
   WHERE "userName" = $1`;
   await client.query(sql, [userName]);
-}
+};
 
 module.exports = {
   createUser,
   readUsers,
   updateUser,
-  deleteUser
+  deleteUser,
 };
