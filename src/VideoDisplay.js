@@ -53,6 +53,7 @@ const VideoDisplay = () => {
   //maybe provide a control so creator can set max participants?
   const createNewSession = async () => {
     const roomToSession = await getRoomToSessionIdDictionary();
+    console.log("get all sessions: ", roomToSession);
     const roomKeys = Object.keys(roomToSession.data);
     console.log("roomToSession: ", roomToSession);
     console.log("roomKeys: ", roomKeys);
@@ -63,6 +64,7 @@ const VideoDisplay = () => {
 
   const joinRandomSession = async () => {
     const roomToSession = await getRoomToSessionIdDictionary();
+     console.log("get all sessions: ", roomToSession);
     const roomKeys = Object.keys(roomToSession.data);
     console.log("roomToSession: ", roomToSession);
     console.log("roomKeys: ", roomKeys);
