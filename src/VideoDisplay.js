@@ -1,3 +1,4 @@
+/* eslint-disable react/button-has-type */
 import React from "react";
 import useOpenTok from "react-use-opentok";
 import axios from "axios";
@@ -17,19 +18,24 @@ const VideoDisplay = () => {
 
   const getRoomToSessionIdDictionary = async () => {
     try {
-      return await axios.get("/allsessions");
+      return await axios.get("/api/opentok/allsessions");
     } catch (error) {
       console.log(new Error(error));
     }
   };
 
+  // const getStreams = async (sessionId) => {
+  //   const response = await axios.get(`/streams/${sessionId}`);
+  //   return response;
+  // };
+
   //  built out should fetch session ID and token from server
   const createSession = async () => {
     console.log("roomname is: ", roomname);
-    const response = await axios.get(`/room/${roomname}`);
+    const response = await axios.get(`/api/opentok/room/${roomname}`);
 
     if (!response) {
-      return new Error("Call to /room/:roomname failed");
+      return new Error("Call to /api/opentok/room/:roomname failed");
     } else {
       apiKey = response.data.apiKey;
       sessionId = response.data.sessionId;
@@ -54,6 +60,7 @@ const VideoDisplay = () => {
     console.log("roomKeys: ", roomKeys);
     roomname = roomKeys.length + 1;
     createSession();
+    console.log(roomToSession);
   };
 
   const joinRandomSession = async () => {
@@ -62,7 +69,7 @@ const VideoDisplay = () => {
     const roomKeys = Object.keys(roomToSession.data);
     console.log("roomToSession: ", roomToSession);
     console.log("roomKeys: ", roomKeys);
-    roomname = Math.floor(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
+    roomname = Math.ceil(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
     createSession();
   };
 
