@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
 import React, { useEffect } from "react";
 import axios from "axios";
@@ -9,9 +10,10 @@ const VideoDisplay = () => {
   let apiKey;
   let sessionId;
   let token;
-  let roomname = 1;
+  let roomname = 0;
   let session;
   let publisher;
+  let subscriber;
 
 
   const getRoomToSessionIdDictionary = async () => {
@@ -43,16 +45,12 @@ const VideoDisplay = () => {
   }
 
   const initializeSession = async () => {
-    if (sessionId) {
-      return
-    }
-    await getAuthKeys();
     session = OT.initSession(apiKey, sessionId);
     console.log("this is the sessionId ", sessionId)
 
     // Subscribe to a newly created stream
     session.on("streamCreated", function (event) {
-      session.subscribe(event.stream, "subscriber", {
+      subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
         width: "100%",
         height: "100%"
@@ -77,41 +75,23 @@ const VideoDisplay = () => {
     });
   }
 
-  const leaveSession = () => {
-
+  const leaveSession = async () => {
+    session.unpublish(publisher);
+    session.unsubscribe(subscriber);
+    //session.disconnect();
+    await axios.post(`/api/opentok/decrimentsession/${roomname}`)
   }
 
-  //maybe provide a control so creator can set max participants?
-  const createNewSession = async () => {
-    const roomToSession = await getRoomToSessionIdDictionary();
-    console.log("roomToSession is ", roomToSession)
-    console.log("get all sessions: ", roomToSession);
-    const roomKeys = Object.keys(roomToSession.data);
-    console.log("roomToSession: ", roomToSession);
-    console.log("roomKeys: ", roomKeys);
-    roomname = roomKeys.length + 1;
-    initializeSession();
-    console.log(roomToSession);
-  };
-
   const joinRandomSession = async () => {
-    const roomToSession = await getRoomToSessionIdDictionary();
-    console.log("get all sessions: ", roomToSession);
-    const roomKeys = Object.keys(roomToSession.data);
-    console.log("roomToSession: ", roomToSession);
-    console.log("roomKeys: ", roomKeys);
-    roomname = Math.ceil(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
+    await getAuthKeys();
+    console.log("session id we are starting with ", sessionId)
     initializeSession();
   };
-
-  useEffect(() => {
-    initializeSession();
-  }, []);
 
   return (
     <div id="video-display-container">
-      <button type="button" onClick={() => createNewSession()}>Create New Session</button>
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
+      <button type="button" onClick={() => leaveSession()}>Leave Session</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
