@@ -1,20 +1,18 @@
 /* eslint-disable react/button-has-type */
-import React from "react";
-import useOpenTok from "react-use-opentok";
+import React, { useEffect } from "react";
 import axios from "axios";
+const OT = require("@opentok/client");
+//const publisher = OT.initPublisher();
 
 const VideoDisplay = () => {
-  //this should come from server
-  //let roomname;//Math.ceil(Math.random() * 10000000000);
+  //this comes from the server
   let apiKey;
   let sessionId;
   let token;
   let roomname = 1;
+  let session;
+  let publisher;
 
-  const [opentokProps, opentokMethods] = useOpenTok();
-  const { isSessionConnected, session, streams } = opentokProps;
-  const { initSessionAndConnect, publish, subscribe } = opentokMethods;
-  let roomToSessionIdDictionary;
 
   const getRoomToSessionIdDictionary = async () => {
     try {
@@ -24,13 +22,8 @@ const VideoDisplay = () => {
     }
   };
 
-  // const getStreams = async (sessionId) => {
-  //   const response = await axios.get(`/streams/${sessionId}`);
-  //   return response;
-  // };
-
   //  built out should fetch session ID and token from server
-  const createSession = async () => {
+  const getAuthKeys = async () => {
     console.log("roomname is: ", roomname);
     const response = await axios.get(`/api/opentok/room/${roomname}`);
 
@@ -41,99 +34,90 @@ const VideoDisplay = () => {
       sessionId = response.data.sessionId;
       token = response.data.token;
     }
-    const promise = await initSessionAndConnect({
-      apiKey,
-      sessionId,
-      token,
-    });
-    if (promise !== undefined) {
-      return new Error("Session initialization and/or connection failed");
+  }
+
+  function handleError(error) {
+    if (error) {
+      alert(error.message);
     }
-  };
+  }
+
+  const initializeSession = async () => {
+    if (sessionId) {
+      return
+    }
+    await getAuthKeys();
+    session = OT.initSession(apiKey, sessionId);
+    console.log("this is the sessionId ", sessionId)
+
+    // Subscribe to a newly created stream
+    session.on("streamCreated", function (event) {
+      session.subscribe(event.stream, "subscriber", {
+        insertMode: "append",
+        width: "100%",
+        height: "100%"
+      }, handleError);
+    });
+
+    // Create a publisher
+    publisher = OT.initPublisher("publisher", {
+      insertMode: "append",
+      width: "100%",
+      height: "100%"
+    }, handleError);
+
+    // Connect to the session
+    session.connect(token, function (error) {
+      // If the connection is successful, publish to the session
+      if (error) {
+        handleError(error);
+      } else {
+        session.publish(publisher, handleError);
+      }
+    });
+  }
+
+  const leaveSession = () => {
+
+  }
 
   //maybe provide a control so creator can set max participants?
   const createNewSession = async () => {
     const roomToSession = await getRoomToSessionIdDictionary();
+    console.log("roomToSession is ", roomToSession)
     console.log("get all sessions: ", roomToSession);
     const roomKeys = Object.keys(roomToSession.data);
     console.log("roomToSession: ", roomToSession);
     console.log("roomKeys: ", roomKeys);
     roomname = roomKeys.length + 1;
-    createSession();
+    initializeSession();
     console.log(roomToSession);
   };
 
   const joinRandomSession = async () => {
     const roomToSession = await getRoomToSessionIdDictionary();
-     console.log("get all sessions: ", roomToSession);
+    console.log("get all sessions: ", roomToSession);
     const roomKeys = Object.keys(roomToSession.data);
     console.log("roomToSession: ", roomToSession);
     console.log("roomKeys: ", roomKeys);
     roomname = Math.ceil(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
-    createSession();
+    initializeSession();
   };
 
-  const publishCamera = () => {
-    publish({
-      name: "camera",
-      element: "me",
-      options: {
-        insertMode: "replace",
-        width: "180px",
-        height: "120px",
-      },
-    });
-    console.log("streams: ", streams);
-  };
-
-  const publishScreen = () => {
-    publish({
-      name: "screen",
-      element: "me",
-      options: {
-        insertMode: "replace",
-        width: "180px",
-        height: "120px",
-        videoSource: "screen",
-      },
-    });
-  };
+  useEffect(() => {
+    initializeSession();
+  }, []);
 
   return (
-    <div>
-      <div id="players">
-        <div id="rightCorner">
-          <div id="me" />
-        </div>
+    <div id="video-display-container">
+      <button type="button" onClick={() => createNewSession()}>Create New Session</button>
+      <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
+      <div id="videos">
         <div id="subscriber" />
-      </div>
-      <button onClick={() => createNewSession()}>Create New Session</button>
-      <button onClick={() => joinRandomSession()}>Join Random Session</button>
-
-      <div>
-        <button onClick={() => publishCamera()}>Publish Camera</button>
-        <button onClick={() => publishScreen()}>Publish Screen</button>
-      </div>
-
-      <div>
-        <ul>
-          {streams.map((stream) => (
-            <li
-              key={stream.streamId}
-              onClick={() => {
-                subscribe({
-                  stream,
-                  element: "subscriber",
-                });
-              }}
-            >
-              {stream.streamId}
-            </li>
-          ))}
-        </ul>
+        <div id="publisher" />
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default VideoDisplay;
