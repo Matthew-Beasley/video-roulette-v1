@@ -1,19 +1,16 @@
 /* eslint-disable react/button-has-type */
-import React from "react";
-import useOpenTok from "react-use-opentok";
+import React, { useEffect } from "react";
 import axios from "axios";
+const OT = require('@opentok/client');
+const publisher = OT.initPublisher();
 
 const VideoDisplay = () => {
   //this should come from server
-  //let roomname;//Math.ceil(Math.random() * 10000000000);
   let apiKey;
   let sessionId;
   let token;
   let roomname = 1;
 
-  const [opentokProps, opentokMethods] = useOpenTok();
-  const { isSessionConnected, session, streams } = opentokProps;
-  const { initSessionAndConnect, publish, subscribe } = opentokMethods;
   let roomToSessionIdDictionary;
 
   const getRoomToSessionIdDictionary = async () => {
@@ -30,7 +27,7 @@ const VideoDisplay = () => {
   // };
 
   //  built out should fetch session ID and token from server
-  const createSession = async () => {
+  const getAuthKeys = async () => {
     console.log("roomname is: ", roomname);
     const response = await axios.get(`/api/opentok/room/${roomname}`);
 
@@ -41,99 +38,59 @@ const VideoDisplay = () => {
       sessionId = response.data.sessionId;
       token = response.data.token;
     }
-    const promise = await initSessionAndConnect({
-      apiKey,
-      sessionId,
-      token,
-    });
-    if (promise !== undefined) {
-      return new Error("Session initialization and/or connection failed");
+
+  }
+
+  function handleError(error) {
+    if (error) {
+      alert(error.message);
     }
-  };
+  }
 
-  //maybe provide a control so creator can set max participants?
-  const createNewSession = async () => {
-    const roomToSession = await getRoomToSessionIdDictionary();
-    console.log("get all sessions: ", roomToSession);
-    const roomKeys = Object.keys(roomToSession.data);
-    console.log("roomToSession: ", roomToSession);
-    console.log("roomKeys: ", roomKeys);
-    roomname = roomKeys.length + 1;
-    createSession();
-    console.log(roomToSession);
-  };
+  const initializeSession = async () => {
+    await getAuthKeys();
+    var session = OT.initSession(apiKey, sessionId);
 
-  const joinRandomSession = async () => {
-    const roomToSession = await getRoomToSessionIdDictionary();
-     console.log("get all sessions: ", roomToSession);
-    const roomKeys = Object.keys(roomToSession.data);
-    console.log("roomToSession: ", roomToSession);
-    console.log("roomKeys: ", roomKeys);
-    roomname = Math.ceil(Math.random() * roomKeys.length); //be sure this hits the first session ([0])
-    createSession();
-  };
-
-  const publishCamera = () => {
-    publish({
-      name: "camera",
-      element: "me",
-      options: {
-        insertMode: "replace",
-        width: "180px",
-        height: "120px",
-      },
+    // Subscribe to a newly created stream
+    session.on("streamCreated", function (event) {
+      session.subscribe(event.stream, "subscriber", {
+        insertMode: "append",
+        width: "200px",
+        height: "200px"
+      }, handleError);
     });
-    console.log("streams: ", streams);
-  };
 
-  const publishScreen = () => {
-    publish({
-      name: "screen",
-      element: "me",
-      options: {
-        insertMode: "replace",
-        width: "180px",
-        height: "120px",
-        videoSource: "screen",
-      },
+
+    // Create a publisher
+    var publisher = OT.initPublisher("publisher", {
+      insertMode: "append",
+      width: "600px",
+      height: "600px"
+    }, handleError);
+
+    // Connect to the session
+    session.connect(token, function (error) {
+      // If the connection is successful, publish to the session
+      if (error) {
+        handleError(error);
+      } else {
+        session.publish(publisher, handleError);
+      }
     });
-  };
+  }
+
+  useEffect(() => {
+    initializeSession();
+  }, []);
 
   return (
-    <div>
-      <div id="players">
-        <div id="rightCorner">
-          <div id="me" />
-        </div>
+    <div id="video-display-container">
+      <div id="videos">
         <div id="subscriber" />
-      </div>
-      <button onClick={() => createNewSession()}>Create New Session</button>
-      <button onClick={() => joinRandomSession()}>Join Random Session</button>
-
-      <div>
-        <button onClick={() => publishCamera()}>Publish Camera</button>
-        <button onClick={() => publishScreen()}>Publish Screen</button>
-      </div>
-
-      <div>
-        <ul>
-          {streams.map((stream) => (
-            <li
-              key={stream.streamId}
-              onClick={() => {
-                subscribe({
-                  stream,
-                  element: "subscriber",
-                });
-              }}
-            >
-              {stream.streamId}
-            </li>
-          ))}
-        </ul>
+        <div id="publisher" />
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default VideoDisplay;
