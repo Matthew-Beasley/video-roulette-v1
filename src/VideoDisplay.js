@@ -1,7 +1,7 @@
 /* eslint-disable react/button-has-type */
 import React, { useEffect } from "react";
 import axios from "axios";
-const OT = require('@opentok/client');
+const OT = require("@opentok/client");
 //const publisher = OT.initPublisher();
 
 const VideoDisplay = () => {
@@ -10,6 +10,9 @@ const VideoDisplay = () => {
   let sessionId;
   let token;
   let roomname = 1;
+  let session;
+  let publisher;
+
 
   const getRoomToSessionIdDictionary = async () => {
     try {
@@ -31,7 +34,6 @@ const VideoDisplay = () => {
       sessionId = response.data.sessionId;
       token = response.data.token;
     }
-
   }
 
   function handleError(error) {
@@ -41,24 +43,27 @@ const VideoDisplay = () => {
   }
 
   const initializeSession = async () => {
+    if (sessionId) {
+      return
+    }
     await getAuthKeys();
-    var session = OT.initSession(apiKey, sessionId);
+    session = OT.initSession(apiKey, sessionId);
     console.log("this is the sessionId ", sessionId)
 
     // Subscribe to a newly created stream
     session.on("streamCreated", function (event) {
       session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
-        width: "200px",
-        height: "200px"
+        width: "100%",
+        height: "100%"
       }, handleError);
     });
 
     // Create a publisher
-    var publisher = OT.initPublisher("publisher", {
+    publisher = OT.initPublisher("publisher", {
       insertMode: "append",
-      width: "600px",
-      height: "600px"
+      width: "100%",
+      height: "100%"
     }, handleError);
 
     // Connect to the session
@@ -70,6 +75,10 @@ const VideoDisplay = () => {
         session.publish(publisher, handleError);
       }
     });
+  }
+
+  const leaveSession = () => {
+
   }
 
   //maybe provide a control so creator can set max participants?
