@@ -37,13 +37,6 @@ var opentok = new OpenTok(apiKey, secret);
 
 var roomToSessionIdDictionary = {};
 
-// returns the room name, given a session ID that was associated with it
-function findRoomFromSessionId(sessionId) {
-  return _.findKey(roomToSessionIdDictionary, function (value) {
-    return value === sessionId;
-  });
-}
-
 const findAvailableRoom = (roomName) => {
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
   const availableRoom = candidateRooms.reduce((acc, candidate) => {
@@ -70,38 +63,37 @@ openTokRouter.get("/allsessions", (req, res, next) => {
   res.send(roomToSessionIdDictionary);
 });
 
-// app.get("/streams/:sessionId", async (req, res, next) => {
-//   const { sessionId } = req.params;
-//   const response = await axios.get(
-//     `https://api.opentok.com/v2/project/${apiKey}/session/${sessionId}/stream/`
-//   );
-//   res.send(response.data);
-// });
+openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
+  const { roomname } = req.params;
+  if (roomToSessionIdDictionary[roomname].connectionCount > 1) {
+    roomToSessionIdDictionary[roomname].connectionCount--;
+  } else if (roomToSessionIdDictionary.connectionCount <= 1) {
+    delete roomToSessionIdDictionary[roomname];
+  }
+  res.status(200).send();
+});
 
 /**
  * GET /room/:name
  */
 openTokRouter.get("/room/:name", function (req, res) {
   let roomName = req.params.name;
-
   let sessionId;
   let token;
-  console.log(
-    "attempting to create a session associated with the room: " + roomName
-  );
 
   // if the room name is associated with a session ID, check number of occupants
+  console.log("we are starting with room: ", roomName)
   if (roomToSessionIdDictionary[roomName] &&
     roomToSessionIdDictionary[roomName].connectionCount >= 2) {
     // if our room isn't available, try to find one
     roomName = findAvailableRoom(roomName);
+    console.log("The room was full, so we randomly generated a new one: ", roomName);
   }
 
   // we should now have an available room, if not drop down to create a room
   if (roomToSessionIdDictionary[roomName] &&
-      roomToSessionIdDictionary[roomName].connectionCount < 2) {
+    roomToSessionIdDictionary[roomName].connectionCount < 2) {
 
-    console.log("this is in the if logic: ", roomToSessionIdDictionary);
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
 
@@ -116,17 +108,17 @@ openTokRouter.get("/room/:name", function (req, res) {
     });
   } else { // ithis is the first time the room is being accessed, create a new session ID
     opentok.createSession({ mediaMode: "routed" }, function (err, session) {
-      console.log("this is in create session", roomToSessionIdDictionary);
       if (err) {
         console.log(err);
         res.status(500).send({ error: "createSession error:" + err });
         return;
       }
-
+      roomName = Object.keys(roomToSessionIdDictionary).length++;
       // now that the room name has a session associated wit it, store it in memory
       // IMPORTANT: Because this is stored in memory, restarting your server will reset these values
       // if you want to store a room-to-session association in your production application
       // you should use a more persistent storage for them
+      console.log("we have to create a new session so we incremented the length of keys to get a new room number ", roomName)
       roomToSessionIdDictionary[roomName] = {
         sessionId: session.sessionId,
         connectionCount: 1,
@@ -145,116 +137,5 @@ openTokRouter.get("/room/:name", function (req, res) {
   }
 });
 
-/**
- * POST /archive/start
- */
-// app.post("/archive/start", function (req, res) {
-//   var json = req.body;
-//   var sessionId = json.sessionId;
-//   opentok.startArchive(
-//     sessionId,
-//     { name: findRoomFromSessionId(sessionId) },
-//     function (err, archive) {
-//       if (err) {
-//         console.error("error in startArchive");
-//         console.error(err);
-//         res.status(500).send({ error: "startArchive error:" + err });
-//         return;
-//       }
-//       res.setHeader("Content-Type", "application/json");
-//       res.send(archive);
-//     }
-//   );
-// });
-
-/**
- * POST /archive/:archiveId/stop
- */
-// app.post("/archive/:archiveId/stop", function (req, res) {
-//   var archiveId = req.params.archiveId;
-//   console.log("attempting to stop archive: " + archiveId);
-//   opentok.stopArchive(archiveId, function (err, archive) {
-//     if (err) {
-//       console.error("error in stopArchive");
-//       console.error(err);
-//       res.status(500).send({ error: "stopArchive error:" + err });
-//       return;
-//     }
-//     res.setHeader("Content-Type", "application/json");
-//     res.send(archive);
-//   });
-// });
-
-/**
- * GET /archive/:archiveId/view
- */
-// app.get("/archive/:archiveId/view", function (req, res) {
-//   var archiveId = req.params.archiveId;
-//   console.log("attempting to view archive: " + archiveId);
-//   opentok.getArchive(archiveId, function (err, archive) {
-//     if (err) {
-//       console.error("error in getArchive");
-//       console.error(err);
-//       res.status(500).send({ error: "getArchive error:" + err });
-//       return;
-//     }
-
-//     if (archive.status === "available") {
-//       res.redirect(archive.url);
-//     } else {
-//       res.render("view", { title: "Archiving Pending" });
-//     }
-//   });
-// });
-
-/**
- * GET /archive/:archiveId
- */
-// app.get("/archive/:archiveId", function (req, res) {
-//   var archiveId = req.params.archiveId;
-
-//   // fetch archive
-//   console.log("attempting to fetch archive: " + archiveId);
-//   opentok.getArchive(archiveId, function (err, archive) {
-//     if (err) {
-//       console.error("error in getArchive");
-//       console.error(err);
-//       res.status(500).send({ error: "getArchive error:" + err });
-//       return;
-//     }
-
-//     // extract as a JSON object
-//     res.setHeader("Content-Type", "application/json");
-//     res.send(archive);
-//   });
-// });
-
-/**
- * GET /archive
- */
-// app.get("/archive", function (req, res) {
-//   var options = {};
-//   if (req.query.count) {
-//     options.count = req.query.count;
-//   }
-//   if (req.query.offset) {
-//     options.offset = req.query.offset;
-//   }
-
-// list archives
-// console.log("attempting to list archives");
-// opentok.listArchives(options, function (err, archives) {
-//   if (err) {
-//     console.error("error in listArchives");
-//     console.error(err);
-//     res.status(500).send({ error: "infoArchive error:" + err });
-//     return;
-//   }
-
-// extract as a JSON object
-//     res.setHeader("Content-Type", "application/json");
-//     res.send(archives);
-//   });
-// });
 
 module.exports = { openTokRouter };
