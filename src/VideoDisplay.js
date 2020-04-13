@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
 //const publisher = OT.initPublisher();
@@ -44,7 +44,7 @@ const VideoDisplay = () => {
     }
   }
 
-  const initializeSession = async () => {
+  const initializeSession = () => {
     session = OT.initSession(apiKey, sessionId);
     console.log("this is the sessionId ", sessionId)
 
@@ -52,8 +52,8 @@ const VideoDisplay = () => {
     session.on("streamCreated", function (event) {
       subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
-        width: "100%",
-        height: "100%"
+        width: 300,
+        height: 300
       }, handleError);
     });
 
@@ -73,25 +73,68 @@ const VideoDisplay = () => {
         session.publish(publisher, handleError);
       }
     });
+    // Receive a signal from peer
+    session.on("signal:msg", function signalCallback(event) {
+      if (event.data === "disconnect") {
+        leaveSession();
+        alert("You have been disconnected, you can join another room!")
+      }
+      else {
+        alert(event.data)
+      }
+    });
+    publisher.on("streamDestroyed", function (event) {
+      event.preventDefault();
+    });
   }
 
-  const leaveSession = async () => {
-    session.unpublish(publisher);
-    session.unsubscribe(subscriber);
-    //session.disconnect();
-    await axios.post(`/api/opentok/decrimentsession/${roomname}`)
+
+  const sendDisconnectSignal = () => {
+    //console.log("this is connection1 ", connection1)
+    console.log("session in sendDisconnectSignal ", session)
+    return new Promise((resolve, reject) => {
+      session.signal({
+        //to: connection1, //this will be useful in other scenarios (groups?)
+        type: "msg",
+        data: "disconnect"
+      }, function signalCallback(error) {
+        if (error) {
+          console.error("Error sending signal:", error.name, error.message);
+          reject(error)
+        } else {
+          resolve("Signal sent successfully");
+        }
+      })
+    });
   }
+
+
+  const leaveSession = async () => {
+    await axios.post(`/api/opentok/decrimentsession/${roomname}`);
+    //console.log("session in leaveSession ", session)
+    session.unsubscribe(subscriber);
+    session.unpublish(publisher);
+    publisher.destroy();
+    subscriber.destroy();
+    session.disconnect();
+  }
+
+
+  const sendStopSignal = async () => {
+    await sendDisconnectSignal();
+  }
+
 
   const joinRandomSession = async () => {
     await getAuthKeys();
-    console.log("session id we are starting with ", sessionId)
     initializeSession();
   };
+
 
   return (
     <div id="video-display-container">
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
-      <button type="button" onClick={() => leaveSession()}>Leave Session</button>
+      <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
