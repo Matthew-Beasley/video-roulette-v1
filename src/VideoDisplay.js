@@ -14,7 +14,6 @@ const VideoDisplay = () => {
   let session;
   let publisher;
   let subscriber;
-  const [message, setMessage] = useState();
 
 
   const getRoomToSessionIdDictionary = async () => {
@@ -45,7 +44,7 @@ const VideoDisplay = () => {
     }
   }
 
-  const initializeSession = async () => {
+  const initializeSession = () => {
     session = OT.initSession(apiKey, sessionId);
     console.log("this is the sessionId ", sessionId)
 
@@ -53,8 +52,8 @@ const VideoDisplay = () => {
     session.on("streamCreated", function (event) {
       subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
-        width: "100%",
-        height: "100%"
+        width: 300,
+        height: 300
       }, handleError);
     });
 
@@ -77,18 +76,16 @@ const VideoDisplay = () => {
     // Receive a signal from peer
     session.on("signal:msg", function signalCallback(event) {
       if (event.data === "disconnect") {
-        setMessage("You have been disconnected, you can join another room!");
         leaveSession();
         alert("You have been disconnected, you can join another room!")
       }
       else {
-        setMessage(event.data);
+        alert(event.data)
       }
     });
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
     });
-    return session;
   }
 
 
@@ -117,8 +114,9 @@ const VideoDisplay = () => {
     //console.log("session in leaveSession ", session)
     session.unsubscribe(subscriber);
     session.unpublish(publisher);
+    publisher.destroy();
+    subscriber.destroy();
     session.disconnect();
-    //publisher.destroy();
   }
 
 
@@ -135,7 +133,6 @@ const VideoDisplay = () => {
 
   return (
     <div id="video-display-container">
-      {message && <h3>{message}</h3>}
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
       <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
       <div id="videos">
