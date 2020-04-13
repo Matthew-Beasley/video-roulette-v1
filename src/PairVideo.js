@@ -101,7 +101,7 @@ const PairVideo = () => {
 
 
   const leaveSession = async () => {
-    await axios.post(`/api/opentok/decrimentsession/${roomname}`);
+    await axios.post(`/api/opentok/deletesession/${roomname}`);
     session.unsubscribe(subscriber);
     session.unpublish(publisher);
     session.disconnect();

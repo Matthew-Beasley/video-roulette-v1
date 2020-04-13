@@ -1,6 +1,6 @@
 /* eslint-disable react/self-closing-comp */
 /* eslint-disable react/button-has-type */
-import React, {   } from "react";
+import React from "react";
 import { Route, Link, useHistory } from "react-router-dom";
 import PairVideo from "./PairVideo";
 import GroupVideo from "./GroupVideo";

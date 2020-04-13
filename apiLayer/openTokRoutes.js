@@ -28,7 +28,7 @@ openTokRouter.get("/allsessions", (req, res, next) => {
 });
 
 
-openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
+openTokRouter.post("/deletesession/:roomname", (req, res, next) => {
   const { roomname } = req.params;
   delete roomToSessionIdDictionary[roomname];
   res.status(200).send();
@@ -36,21 +36,17 @@ openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
 
 
 openTokRouter.get("/pairs", function (req, res) {
-  let roomName = req.params.name;
   let sessionId;
   let token;
 
-  roomName = findAvailableRoom();
+  let roomName = findAvailableRoom();
 
   // we should now have an available room, if not drop down to create a room
   if (roomToSessionIdDictionary[roomName] &&
     roomToSessionIdDictionary[roomName].connectionCount < 2) {
-    console.log("we found an existing room with 1 person in it. ", roomName)
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
-    console.log("Now we have assigned a sessionID to our room: ", roomName);
-    console.log(`the connection count in room ${roomName} is ${roomToSessionIdDictionary[roomName].connectionCount} after we joined`)
-
+    
     // generate token
     token = opentok.generateToken(sessionId);
     res.setHeader("Content-Type", "application/json");
@@ -69,10 +65,7 @@ openTokRouter.get("/pairs", function (req, res) {
         return;
       }
       roomName = Object.keys(roomToSessionIdDictionary).length++;
-      // now that the room name has a session associated wit it, store it in memory
-      // IMPORTANT: Because this is stored in memory, restarting your server will reset these values
-      // if you want to store a room-to-session association in your production application
-      // you should use a more persistent storage for them
+
       console.log("we have to create a new session so we incremented the length of keys to get a new room number ", roomName)
       roomToSessionIdDictionary[roomName] = {
         sessionId: session.sessionId,
