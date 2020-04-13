@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
 //const publisher = OT.initPublisher();
@@ -14,6 +14,7 @@ const VideoDisplay = () => {
   let session;
   let publisher;
   let subscriber;
+  const [message, setMessage] = useState();
 
 
   const getRoomToSessionIdDictionary = async () => {
@@ -73,25 +74,70 @@ const VideoDisplay = () => {
         session.publish(publisher, handleError);
       }
     });
+    // Receive a signal from peer
+    session.on("signal:msg", function signalCallback(event) {
+      if (event.data === "disconnect") {
+        setMessage("You have been disconnected, you can join another room!");
+        leaveSession();
+        alert("You have been disconnected, you can join another room!")
+      }
+      else {
+        setMessage(event.data);
+      }
+    });
+    publisher.on("streamDestroyed", function (event) {
+      event.preventDefault();
+    });
+    return session;
   }
 
-  const leaveSession = async () => {
-    session.unpublish(publisher);
-    session.unsubscribe(subscriber);
-    //session.disconnect();
-    await axios.post(`/api/opentok/decrimentsession/${roomname}`)
+
+  const sendDisconnectSignal = () => {
+    //console.log("this is connection1 ", connection1)
+    console.log("session in sendDisconnectSignal ", session)
+    return new Promise((resolve, reject) => {
+      session.signal({
+        //to: connection1, //this will be useful in other scenarios (groups?)
+        type: "msg",
+        data: "disconnect"
+      }, function signalCallback(error) {
+        if (error) {
+          console.error("Error sending signal:", error.name, error.message);
+          reject(error)
+        } else {
+          resolve("Signal sent successfully");
+        }
+      })
+    });
   }
+
+
+  const leaveSession = async () => {
+    await axios.post(`/api/opentok/decrimentsession/${roomname}`);
+    //console.log("session in leaveSession ", session)
+    session.unsubscribe(subscriber);
+    session.unpublish(publisher);
+    session.disconnect();
+    //publisher.destroy();
+  }
+
+
+  const sendStopSignal = async () => {
+    await sendDisconnectSignal();
+  }
+
 
   const joinRandomSession = async () => {
     await getAuthKeys();
-    console.log("session id we are starting with ", sessionId)
     initializeSession();
   };
 
+
   return (
     <div id="video-display-container">
+      {message && <h3>{message}</h3>}
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
-      <button type="button" onClick={() => leaveSession()}>Leave Session</button>
+      <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
