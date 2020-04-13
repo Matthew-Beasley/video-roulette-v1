@@ -5,6 +5,7 @@ import axios from "axios";
 const OT = require("@opentok/client");
 //const publisher = OT.initPublisher();
 
+
 const VideoDisplay = () => {
   //this comes from the server
   let apiKey;
@@ -24,13 +25,14 @@ const VideoDisplay = () => {
     }
   };
 
+
   //  built out should fetch session ID and token from server
   const getAuthKeys = async () => {
     console.log("roomname is: ", roomname);
-    const response = await axios.get(`/api/opentok/room/${roomname}`);
+    const response = await axios.get("/api/opentok/room");
 
     if (!response) {
-      return new Error("Call to /api/opentok/room/:roomname failed");
+      return new Error("Call to /api/opentok/room failed");
     } else {
       apiKey = response.data.apiKey;
       sessionId = response.data.sessionId;
@@ -38,11 +40,13 @@ const VideoDisplay = () => {
     }
   }
 
+
   function handleError(error) {
     if (error) {
       alert(error.message);
     }
   }
+
 
   const initializeSession = () => {
     session = OT.initSession(apiKey, sessionId);
@@ -52,8 +56,8 @@ const VideoDisplay = () => {
     session.on("streamCreated", function (event) {
       subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
-        width: 300,
-        height: 300
+        width: 400,
+        height: 400
       }, handleError);
     });
 
@@ -111,12 +115,11 @@ const VideoDisplay = () => {
 
   const leaveSession = async () => {
     await axios.post(`/api/opentok/decrimentsession/${roomname}`);
-    //console.log("session in leaveSession ", session)
     session.unsubscribe(subscriber);
     session.unpublish(publisher);
+    session.disconnect();
     publisher.destroy();
     subscriber.destroy();
-    session.disconnect();
   }
 
 

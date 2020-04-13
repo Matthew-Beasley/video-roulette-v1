@@ -16,19 +16,14 @@ var opentok = new OpenTok(apiKey, secret);
 
 var roomToSessionIdDictionary = {};
 
-const findAvailableRoom = (roomName) => {
+const findAvailableRoom = () => {
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
-  const availableRoom = candidateRooms.reduce((acc, candidate) => {
-    if (roomToSessionIdDictionary[candidate].connectionCount < 2) {
-      acc = candidate;
+  for (let i = 0; i < candidateRooms.length; i++) {
+    if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < 2) {
+      return candidateRooms[i];
     }
-    return candidate;
-  }, 1);
-  if (availableRoom !== 0) {
-    return availableRoom;
-  } else {
-    return roomName;
   }
+  return null;
 }
 
 /**
@@ -44,41 +39,24 @@ openTokRouter.get("/allsessions", (req, res, next) => {
 
 openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
   const { roomname } = req.params;
-  console.log(`connectionCount in room ${roomname} before leave called is ${roomToSessionIdDictionary[roomname].connectionCount}`)
-  if (roomToSessionIdDictionary[roomname].connectionCount >= 1) {
-    roomToSessionIdDictionary[roomname].connectionCount--;
-    console.log(`connectionCount in room ${roomname} after leave called is ${roomToSessionIdDictionary[roomname].connectionCount}`)
-  }
-  if (roomToSessionIdDictionary[roomname].connectionCount < 1) {
-    delete roomToSessionIdDictionary[roomname];
-    console.log(`${roomname} was deleted from dictionary`)
-    console.log(`this is the new dictionary ${JSON.stringify(roomToSessionIdDictionary)}`)
-  }
+  delete roomToSessionIdDictionary[roomname];
   res.status(200).send();
 });
 
 /**
  * GET /room/:name
  */
-openTokRouter.get("/room/:name", function (req, res) {
+openTokRouter.get("/room", function (req, res) {
   let roomName = req.params.name;
   let sessionId;
   let token;
 
-  // if the room name is associated with a session ID, check number of occupants
-  console.log("we are starting with room: ", roomName)
-  if (roomToSessionIdDictionary[roomName] &&
-    roomToSessionIdDictionary[roomName].connectionCount >= 2) {
-    // if our room isn't available, try to find one
-    roomName = findAvailableRoom(roomName);
-    console.log("The room was full, so we randomly generated a new one: ", roomName);
-    console.log(`the connection count in room ${roomName} is ${roomToSessionIdDictionary[roomName].connectionCount}`)
-  }
+  roomName = findAvailableRoom();
 
   // we should now have an available room, if not drop down to create a room
   if (roomToSessionIdDictionary[roomName] &&
     roomToSessionIdDictionary[roomName].connectionCount < 2) {
-
+    console.log("we found an existing room with 1 person in it. ", roomName)
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
     console.log("Now we have assigned a sessionID to our room: ", roomName);
@@ -93,7 +71,8 @@ openTokRouter.get("/room/:name", function (req, res) {
       token: token,
       dictionary: roomToSessionIdDictionary,
     });
-  } else { // ithis is the first time the room is being accessed, create a new session ID
+    // ithis is the first time the room is being accessed, create a new session ID
+  } else if (!roomName) { 
     opentok.createSession({ mediaMode: "routed" }, function (err, session) {
       if (err) {
         console.log(err);
