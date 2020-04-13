@@ -6,7 +6,7 @@ const OT = require("@opentok/client");
 //const publisher = OT.initPublisher();
 
 
-const VideoDisplay = () => {
+const PairVideo = () => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -17,19 +17,9 @@ const VideoDisplay = () => {
   let subscriber;
 
 
-  const getRoomToSessionIdDictionary = async () => {
-    try {
-      return await axios.get("/api/opentok/allsessions");
-    } catch (error) {
-      console.log(new Error(error));
-    }
-  };
-
-
-  //  built out should fetch session ID and token from server
   const getAuthKeys = async () => {
     console.log("roomname is: ", roomname);
-    const response = await axios.get("/api/opentok/room");
+    const response = await axios.get("/api/opentok/pairs");
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -94,11 +84,8 @@ const VideoDisplay = () => {
 
 
   const sendDisconnectSignal = () => {
-    //console.log("this is connection1 ", connection1)
-    console.log("session in sendDisconnectSignal ", session)
     return new Promise((resolve, reject) => {
       session.signal({
-        //to: connection1, //this will be useful in other scenarios (groups?)
         type: "msg",
         data: "disconnect"
       }, function signalCallback(error) {
@@ -146,4 +133,4 @@ const VideoDisplay = () => {
   )
 }
 
-export default VideoDisplay;
+export default PairVideo;
