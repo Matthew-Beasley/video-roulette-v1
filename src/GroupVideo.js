@@ -125,15 +125,6 @@ const GroupVideo = () => {
       <button type="button" onClick={() => leaveSession()}>Leave Session</button>
       <div id="videos">
         <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
-        <div id="subscriber" />
         <div id="publisher" />
       </div>
     </div>
