@@ -12,10 +12,10 @@ var opentok = new OpenTok(apiKey, secret);
 // This is not persisted. Redis?
 var roomToSessionIdDictionary = {};
 
-const findAvailableRoom = () => {
+const findAvailableRoom = (participants) => {
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
   for (let i = 0; i < candidateRooms.length; i++) {
-    if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < 2) {
+    if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < participants) {
       return candidateRooms[i];
     }
   }
@@ -35,18 +35,29 @@ openTokRouter.post("/deletesession/:roomname", (req, res, next) => {
 });
 
 
-openTokRouter.get("/pairs", function (req, res) {
+openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
+  const { roomname } = req.params;
+  roomToSessionIdDictionary[roomname].connectionCount--;
+  console.log("room decrimented to ", roomToSessionIdDictionary[roomname].connectionCount)
+  if (roomToSessionIdDictionary[roomname].connectionCount <= 0) {
+    delete roomToSessionIdDictionary[roomname];
+    console.log("room deleted")
+  }
+  res.status(201).send();
+});
+
+
+openTokRouter.get("/chat/:memberscount", function (req, res, next) {
   let sessionId;
   let token;
-
-  let roomName = findAvailableRoom();
+  const { memberscount } = req.params;
+  let roomName = findAvailableRoom(memberscount);
 
   // we should now have an available room, if not drop down to create a room
-  if (roomToSessionIdDictionary[roomName] &&
-    roomToSessionIdDictionary[roomName].connectionCount < 2) {
+  if (roomName) {
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
-    
+
     // generate token
     token = opentok.generateToken(sessionId);
     res.setHeader("Content-Type", "application/json");
@@ -56,8 +67,8 @@ openTokRouter.get("/pairs", function (req, res) {
       token: token,
       dictionary: roomToSessionIdDictionary,
     });
-    // ithis is the first time the room is being accessed, create a new session ID
-  } else if (!roomName) { 
+    // this is the first time the room is being accessed, create a new session ID
+  } else if (!roomName) {
     opentok.createSession({ mediaMode: "routed" }, function (err, session) {
       if (err) {
         console.log(err);
@@ -65,8 +76,6 @@ openTokRouter.get("/pairs", function (req, res) {
         return;
       }
       roomName = Object.keys(roomToSessionIdDictionary).length++;
-
-      console.log("we have to create a new session so we incremented the length of keys to get a new room number ", roomName)
       roomToSessionIdDictionary[roomName] = {
         sessionId: session.sessionId,
         connectionCount: 1,
@@ -84,6 +93,5 @@ openTokRouter.get("/pairs", function (req, res) {
     });
   }
 });
-
 
 module.exports = { openTokRouter };

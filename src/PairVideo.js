@@ -18,8 +18,7 @@ const PairVideo = () => {
 
 
   const getAuthKeys = async () => {
-    console.log("roomname is: ", roomname);
-    const response = await axios.get("/api/opentok/pairs");
+    const response = await axios.get(`/api/opentok/chat/${2}`);
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -40,7 +39,6 @@ const PairVideo = () => {
 
   const initializeSession = () => {
     session = OT.initSession(apiKey, sessionId);
-    console.log("this is the sessionId ", sessionId)
 
     // Subscribe to a newly created stream
     session.on("streamCreated", function (event) {
