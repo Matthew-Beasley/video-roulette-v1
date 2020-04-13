@@ -9,11 +9,7 @@ const secret = "633543163127909d7a0d4e2c3007a4ac486ef81a";
 var OpenTok = require("opentok");
 var opentok = new OpenTok(apiKey, secret);
 
-// IMPORTANT: roomToSessionIdDictionary is a variable that associates room names with unique
-// unique sesssion IDs. However, since this is stored in memory, restarting your server will
-// reset these values if you want to have a room-to-session association in your production
-// application you should consider a more persistent storage
-
+// This is not persisted. Redis?
 var roomToSessionIdDictionary = {};
 
 const findAvailableRoom = () => {
@@ -26,16 +22,11 @@ const findAvailableRoom = () => {
   return null;
 }
 
-/**
- * GET /session redirects to /room/session
- */
-openTokRouter.get("/session", function (req, res, next) {
-  res.redirect("/room/session");
-});
 
 openTokRouter.get("/allsessions", (req, res, next) => {
   res.send(roomToSessionIdDictionary);
 });
+
 
 openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
   const { roomname } = req.params;
@@ -43,10 +34,8 @@ openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
   res.status(200).send();
 });
 
-/**
- * GET /room/:name
- */
-openTokRouter.get("/room", function (req, res) {
+
+openTokRouter.get("/pairs", function (req, res) {
   let roomName = req.params.name;
   let sessionId;
   let token;
