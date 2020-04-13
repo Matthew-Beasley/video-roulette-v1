@@ -18,10 +18,7 @@ const GroupVideo = () => {
 
 
   const getAuthKeys = async () => {
-    console.log("roomname is: ", roomname);
-
-    //CHANGE THIS TO GROUP ROUTE
-    const response = await axios.get("/api/opentok/pairs");
+    const response = await axios.get(`/api/opentok/chat/${10}`);
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -47,8 +44,8 @@ const GroupVideo = () => {
     session.on("streamCreated", function (event) {
       subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
-        width: 400,
-        height: 400
+        width: 300,
+        height: 300
       }, handleError);
     });
 
@@ -71,8 +68,7 @@ const GroupVideo = () => {
     // Receive a signal from peer
     session.on("signal:msg", function signalCallback(event) {
       if (event.data === "disconnect") {
-        leaveSession();
-        alert("You have been disconnected, you can join another room!")
+        alert("<username> has disconnected (on purpose I hope!)")
       }
       else {
         alert(event.data)
@@ -102,17 +98,18 @@ const GroupVideo = () => {
 
 
   const leaveSession = async () => {
-    await axios.post(`/api/opentok/decrimentsession/${roomname}`);
+    await sendDisconnectSignal();
+    try {
+      await axios.post(`/api/opentok/decrimentsession/${roomname}`);
+    } catch (err) {
+      console.log(err);
+    }
+    console.log("made it past the axios decrement call")
     session.unsubscribe(subscriber);
     session.unpublish(publisher);
     session.disconnect();
     publisher.destroy();
     subscriber.destroy();
-  }
-
-
-  const sendStopSignal = async () => {
-    await sendDisconnectSignal();
   }
 
 
@@ -125,8 +122,17 @@ const GroupVideo = () => {
   return (
     <div id="video-display-container">
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
-      <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
+      <button type="button" onClick={() => leaveSession()}>Leave Session</button>
       <div id="videos">
+        <div id="subscriber" />
+        <div id="subscriber" />
+        <div id="subscriber" />
+        <div id="subscriber" />
+        <div id="subscriber" />
+        <div id="subscriber" />
+        <div id="subscriber" />
+        <div id="subscriber" />
+        <div id="subscriber" />
         <div id="subscriber" />
         <div id="publisher" />
       </div>
