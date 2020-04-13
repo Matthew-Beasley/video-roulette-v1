@@ -6,27 +6,6 @@ const openTokRouter = express.Router();
 const apiKey = 46648222;
 const secret = "633543163127909d7a0d4e2c3007a4ac486ef81a";
 
-if (!apiKey || !secret) {
-  console.error(
-    "========================================================================================================="
-  );
-  console.error("");
-  console.error("Missing TOKBOX_API_KEY or TOKBOX_SECRET");
-  console.error(
-    "Find the appropriate values for these by logging into your TokBox Dashboard at: https://tokbox.com/account/#/"
-  );
-  console.error(
-    "Then add them to ",
-    path.resolve(".env"),
-    "or as environment variables"
-  );
-  console.error("");
-  console.error(
-    "========================================================================================================="
-  );
-  process.exit();
-}
-
 var OpenTok = require("opentok");
 var opentok = new OpenTok(apiKey, secret);
 
@@ -44,7 +23,7 @@ const findAvailableRoom = (roomName) => {
       acc = candidate;
     }
     return candidate;
-  }, 0);
+  }, 1);
   if (availableRoom !== 0) {
     return availableRoom;
   } else {
@@ -65,10 +44,15 @@ openTokRouter.get("/allsessions", (req, res, next) => {
 
 openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
   const { roomname } = req.params;
-  if (roomToSessionIdDictionary[roomname].connectionCount > 1) {
+  console.log(`connectionCount in room ${roomname} before leave called is ${roomToSessionIdDictionary[roomname].connectionCount}`)
+  if (roomToSessionIdDictionary[roomname].connectionCount >= 1) {
     roomToSessionIdDictionary[roomname].connectionCount--;
-  } else if (roomToSessionIdDictionary.connectionCount <= 1) {
+    console.log(`connectionCount in room ${roomname} after leave called is ${roomToSessionIdDictionary[roomname].connectionCount}`)
+  }
+  if (roomToSessionIdDictionary[roomname].connectionCount < 1) {
     delete roomToSessionIdDictionary[roomname];
+    console.log(`${roomname} was deleted from dictionary`)
+    console.log(`this is the new dictionary ${JSON.stringify(roomToSessionIdDictionary)}`)
   }
   res.status(200).send();
 });
@@ -88,6 +72,7 @@ openTokRouter.get("/room/:name", function (req, res) {
     // if our room isn't available, try to find one
     roomName = findAvailableRoom(roomName);
     console.log("The room was full, so we randomly generated a new one: ", roomName);
+    console.log(`the connection count in room ${roomName} is ${roomToSessionIdDictionary[roomName].connectionCount}`)
   }
 
   // we should now have an available room, if not drop down to create a room
@@ -96,6 +81,8 @@ openTokRouter.get("/room/:name", function (req, res) {
 
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
+    console.log("Now we have assigned a sessionID to our room: ", roomName);
+    console.log(`the connection count in room ${roomName} is ${roomToSessionIdDictionary[roomName].connectionCount} after we joined`)
 
     // generate token
     token = opentok.generateToken(sessionId);
