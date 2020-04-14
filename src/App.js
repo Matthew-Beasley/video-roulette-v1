@@ -4,11 +4,12 @@ import React, { useEffect } from "react";
 import { Route, Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import VideoDisplay from "./VideoDisplay";
+import Login from "./Login";
 
 const App = () => {
   return (
     <div id="container">
-      {/* <Route path="/Register" render={() => <Register />} /> */}
+      <Route path="/Login" render={() => <Login />} />
       <Route exact path="/" render={() => <VideoDisplay />} />
     </div>
   );
