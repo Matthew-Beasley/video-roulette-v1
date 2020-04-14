@@ -3,7 +3,7 @@ const qs = require("querystring");
 const Axios = require("axios");
 
 const redirect_uri =
-  process.env.REDIRECT_URI || "http://localhost:3000/auth/callback";
+  process.env.REDIRECT_URI || "http://localhost:3000/api/auth/callback";
 const emailScope = "https://www.googleapis.com/auth/userinfo.email";
 const userScope = "https://www.googleapis.com/auth/userinfo.profile";
 
