@@ -18,7 +18,7 @@ const PairVideo = () => {
 
 
   const getAuthKeys = async () => {
-    const response = await axios.get(`/api/opentok/chat/${2}`);
+    const response = await axios.post(`/api/opentok/chat/${2}`, { visitedRooms: [] });
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");

@@ -15,17 +15,19 @@ const GroupVideo = () => {
   let session;
   let publisher;
   let subscriber;
+  const visitedRooms = [];
 
 
   const getAuthKeys = async () => {
-    const response = await axios.get(`/api/opentok/chat/${10}`);
-
+    const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms });
+    
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
     } else {
       apiKey = response.data.apiKey;
       sessionId = response.data.sessionId;
       token = response.data.token;
+      visitedRooms.push(response.data.sessionId)
     }
   }
 
