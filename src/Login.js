@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+// code from Justin's project
 // const handleSubmit = async (ev) => {
 //   ev.preventDefault();
 //   try {
@@ -31,7 +32,7 @@ const Login = (handleSubmit) => {
     ev.preventDefault();
     console.log(email, password);
     try {
-      axios.get("/auth", {
+      axios.get("/api/auth", {
         email,
         password,
       });
@@ -44,7 +45,8 @@ const Login = (handleSubmit) => {
   return (
     <form
       onSubmit={onSubmit}
-      // method="GET" action={"/auth/google"}
+      //substituted form action with onSubmit function
+      //method="GET" action={"/auth/google"}
     >
       <div>
         <input
