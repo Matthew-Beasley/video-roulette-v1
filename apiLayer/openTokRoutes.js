@@ -13,7 +13,6 @@ var opentok = new OpenTok(apiKey, secret);
 var roomToSessionIdDictionary = {};
 
 const findAvailableRoom = (participants, visitedRooms) => {
-  console.log("visitedRooms in the findAvaliableRoom is ", visitedRooms)
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
   for (let i = 0; i < candidateRooms.length; i++) {
     if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < participants &&
@@ -40,10 +39,8 @@ openTokRouter.post("/deletesession/:roomname", (req, res, next) => {
 openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
   const { roomname } = req.params;
   roomToSessionIdDictionary[roomname].connectionCount--;
-  console.log("room decrimented to ", roomToSessionIdDictionary[roomname].connectionCount)
   if (roomToSessionIdDictionary[roomname].connectionCount <= 0) {
     delete roomToSessionIdDictionary[roomname];
-    console.log("room deleted")
   }
   res.status(201).send();
 });

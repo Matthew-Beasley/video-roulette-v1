@@ -25,7 +25,6 @@ authRouter.get("/callback", async (req, res, next) => {
         redirect_uri,
       }
     );
-    console.log(data);
     const { data: _user } = await Axios.get(
       "https://www.googleapis.com/oauth2/v2/userinfo",
       {

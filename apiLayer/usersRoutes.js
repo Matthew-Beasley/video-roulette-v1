@@ -12,7 +12,6 @@ usersRouter.post("/", async (req, res, next) => {
   try {
     const data = await createUser(req.body);
     res.send(data);
-    console.log(data);
     res.status(200).send(data);
   } catch (error) {
     next(error);
