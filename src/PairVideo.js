@@ -1,11 +1,12 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
 //const publisher = OT.initPublisher();
 
-const VideoDisplay = () => {
+
+const PairVideo = () => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -16,21 +17,11 @@ const VideoDisplay = () => {
   let subscriber;
 
 
-  const getRoomToSessionIdDictionary = async () => {
-    try {
-      return await axios.get("/api/opentok/allsessions");
-    } catch (error) {
-      console.log(new Error(error));
-    }
-  };
-
-  //  built out should fetch session ID and token from server
   const getAuthKeys = async () => {
-    console.log("roomname is: ", roomname);
-    const response = await axios.get(`/api/opentok/room/${roomname}`);
+    const response = await axios.post(`/api/opentok/chat/${2}`, { visitedRooms: [] });
 
     if (!response) {
-      return new Error("Call to /api/opentok/room/:roomname failed");
+      return new Error("Call to /api/opentok/room failed");
     } else {
       apiKey = response.data.apiKey;
       sessionId = response.data.sessionId;
@@ -38,22 +29,23 @@ const VideoDisplay = () => {
     }
   }
 
+
   function handleError(error) {
     if (error) {
       alert(error.message);
     }
   }
 
-  const initializeSession = async () => {
+
+  const initializeSession = () => {
     session = OT.initSession(apiKey, sessionId);
-    console.log("this is the sessionId ", sessionId)
 
     // Subscribe to a newly created stream
     session.on("streamCreated", function (event) {
       subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
-        width: "100%",
-        height: "100%"
+        width: 400,
+        height: 400
       }, handleError);
     });
 
@@ -73,25 +65,64 @@ const VideoDisplay = () => {
         session.publish(publisher, handleError);
       }
     });
+    // Receive a signal from peer
+    session.on("signal:msg", function signalCallback(event) {
+      if (event.data === "disconnect") {
+        leaveSession();
+        alert("You have been disconnected, you can join another room!")
+      }
+      else {
+        alert(event.data)
+      }
+    });
+    publisher.on("streamDestroyed", function (event) {
+      event.preventDefault();
+    });
   }
 
-  const leaveSession = async () => {
-    session.unpublish(publisher);
-    session.unsubscribe(subscriber);
-    //session.disconnect();
-    await axios.post(`/api/opentok/decrimentsession/${roomname}`)
+
+  const sendDisconnectSignal = () => {
+    return new Promise((resolve, reject) => {
+      session.signal({
+        type: "msg",
+        data: "disconnect"
+      }, function signalCallback(error) {
+        if (error) {
+          console.error("Error sending signal:", error.name, error.message);
+          reject(error)
+        } else {
+          resolve("Signal sent successfully");
+        }
+      })
+    });
   }
+
+
+  const leaveSession = async () => {
+    await axios.post(`/api/opentok/deletesession/${roomname}`);
+    session.unsubscribe(subscriber);
+    session.unpublish(publisher);
+    session.disconnect();
+    publisher.destroy();
+    subscriber.destroy();
+  }
+
+
+  const sendStopSignal = async () => {
+    await sendDisconnectSignal();
+  }
+
 
   const joinRandomSession = async () => {
     await getAuthKeys();
-    console.log("session id we are starting with ", sessionId)
     initializeSession();
   };
+
 
   return (
     <div id="video-display-container">
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
-      <button type="button" onClick={() => leaveSession()}>Leave Session</button>
+      <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
@@ -100,4 +131,4 @@ const VideoDisplay = () => {
   )
 }
 
-export default VideoDisplay;
+export default PairVideo;

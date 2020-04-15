@@ -6,94 +6,58 @@ const openTokRouter = express.Router();
 const apiKey = 46648222;
 const secret = "633543163127909d7a0d4e2c3007a4ac486ef81a";
 
-if (!apiKey || !secret) {
-  console.error(
-    "========================================================================================================="
-  );
-  console.error("");
-  console.error("Missing TOKBOX_API_KEY or TOKBOX_SECRET");
-  console.error(
-    "Find the appropriate values for these by logging into your TokBox Dashboard at: https://tokbox.com/account/#/"
-  );
-  console.error(
-    "Then add them to ",
-    path.resolve(".env"),
-    "or as environment variables"
-  );
-  console.error("");
-  console.error(
-    "========================================================================================================="
-  );
-  process.exit();
-}
-
 var OpenTok = require("opentok");
 var opentok = new OpenTok(apiKey, secret);
 
-// IMPORTANT: roomToSessionIdDictionary is a variable that associates room names with unique
-// unique sesssion IDs. However, since this is stored in memory, restarting your server will
-// reset these values if you want to have a room-to-session association in your production
-// application you should consider a more persistent storage
-
+// This is not persisted. Redis?
 var roomToSessionIdDictionary = {};
 
-const findAvailableRoom = (roomName) => {
+const findAvailableRoom = (participants, visitedRooms) => {
+  console.log("visitedRooms in the findAvaliableRoom is ", visitedRooms)
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
-  const availableRoom = candidateRooms.reduce((acc, candidate) => {
-    if (roomToSessionIdDictionary[candidate].connectionCount < 2) {
-      acc = candidate;
+  for (let i = 0; i < candidateRooms.length; i++) {
+    if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < participants &&
+        visitedRooms.includes(roomToSessionIdDictionary[candidateRooms[i]].sessionId) !== true) {
+      return candidateRooms[i];
     }
-    return candidate;
-  }, 0);
-  if (availableRoom !== 0) {
-    return availableRoom;
-  } else {
-    return roomName;
   }
+  return null;
 }
 
-/**
- * GET /session redirects to /room/session
- */
-openTokRouter.get("/session", function (req, res, next) {
-  res.redirect("/room/session");
-});
 
 openTokRouter.get("/allsessions", (req, res, next) => {
   res.send(roomToSessionIdDictionary);
 });
 
-openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
+
+openTokRouter.post("/deletesession/:roomname", (req, res, next) => {
   const { roomname } = req.params;
-  if (roomToSessionIdDictionary[roomname].connectionCount > 1) {
-    roomToSessionIdDictionary[roomname].connectionCount--;
-  } else if (roomToSessionIdDictionary.connectionCount <= 1) {
-    delete roomToSessionIdDictionary[roomname];
-  }
+  delete roomToSessionIdDictionary[roomname];
   res.status(200).send();
 });
 
-/**
- * GET /room/:name
- */
-openTokRouter.get("/room/:name", function (req, res) {
-  let roomName = req.params.name;
+
+openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
+  const { roomname } = req.params;
+  roomToSessionIdDictionary[roomname].connectionCount--;
+  console.log("room decrimented to ", roomToSessionIdDictionary[roomname].connectionCount)
+  if (roomToSessionIdDictionary[roomname].connectionCount <= 0) {
+    delete roomToSessionIdDictionary[roomname];
+    console.log("room deleted")
+  }
+  res.status(201).send();
+});
+
+
+openTokRouter.post("/chat/:memberscount", function (req, res, next) {
   let sessionId;
   let token;
-
-  // if the room name is associated with a session ID, check number of occupants
-  console.log("we are starting with room: ", roomName)
-  if (roomToSessionIdDictionary[roomName] &&
-    roomToSessionIdDictionary[roomName].connectionCount >= 2) {
-    // if our room isn't available, try to find one
-    roomName = findAvailableRoom(roomName);
-    console.log("The room was full, so we randomly generated a new one: ", roomName);
-  }
+  const { memberscount } = req.params;
+  const { visitedRooms } = req.body;
+  let roomName = findAvailableRoom(memberscount, visitedRooms);
 
   // we should now have an available room, if not drop down to create a room
-  if (roomToSessionIdDictionary[roomName] &&
-    roomToSessionIdDictionary[roomName].connectionCount < 2) {
-
+  if (roomName) {
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
 
@@ -106,7 +70,8 @@ openTokRouter.get("/room/:name", function (req, res) {
       token: token,
       dictionary: roomToSessionIdDictionary,
     });
-  } else { // ithis is the first time the room is being accessed, create a new session ID
+    // this is the first time the room is being accessed, create a new session ID
+  } else if (!roomName) {
     opentok.createSession({ mediaMode: "routed" }, function (err, session) {
       if (err) {
         console.log(err);
@@ -114,11 +79,6 @@ openTokRouter.get("/room/:name", function (req, res) {
         return;
       }
       roomName = Object.keys(roomToSessionIdDictionary).length++;
-      // now that the room name has a session associated wit it, store it in memory
-      // IMPORTANT: Because this is stored in memory, restarting your server will reset these values
-      // if you want to store a room-to-session association in your production application
-      // you should use a more persistent storage for them
-      console.log("we have to create a new session so we incremented the length of keys to get a new room number ", roomName)
       roomToSessionIdDictionary[roomName] = {
         sessionId: session.sessionId,
         connectionCount: 1,
@@ -136,6 +96,5 @@ openTokRouter.get("/room/:name", function (req, res) {
     });
   }
 });
-
 
 module.exports = { openTokRouter };
