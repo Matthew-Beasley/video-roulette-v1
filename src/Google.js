@@ -1,6 +1,6 @@
+//currently not used
 import React from "react";
 
-//currently not used
 const Google = () => (
   <form method="GET" action={"/auth/google"}>
     <div className="field is-centered">

@@ -9,7 +9,11 @@ import Login from "./Login";
 const App = () => {
   return (
     <div id="container">
+<<<<<<< Updated upstream
       <Route path="/Login" render={() => <Login />} />
+=======
+      <Route path="/login" render={() => <Login />} />
+>>>>>>> Stashed changes
       <Route exact path="/" render={() => <VideoDisplay />} />
     </div>
   );
