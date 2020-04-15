@@ -6,7 +6,6 @@ import PairVideo from "./PairVideo";
 import GroupVideo from "./GroupVideo";
 import Login from "./Login";
 
-let token;
 const headers = () => {
   const token = window.localStorage.getItem("token");
   return {
@@ -18,9 +17,17 @@ const headers = () => {
 
 const App = () => {
   const [token, setToken] = useState("");
+  const history = useHistory();
+
   useEffect(() => {
     setToken(window.localStorage.getItem("token"));
   }, []);
+
+  function logout() {
+    window.localStorage.removeItem("token");
+    setToken("");
+    history.push("/login");
+  }
 
   console.log(token);
   if (!token) {
@@ -33,6 +40,7 @@ const App = () => {
   } else {
     return (
       <div id="container">
+        <button onClick={() => logout()}>logout</button>
         <Link to="/pair">One on One Fun</Link>
         <Link to="/group">Join a Crowd</Link>
         <Route path="/pair" render={() => <PairVideo />} />
