@@ -1,6 +1,12 @@
 const authRouter = require("express").Router();
 const qs = require("querystring");
 const Axios = require("axios");
+const {
+  createUser,
+  readUsers,
+  updateUser,
+  deleteUser,
+} = require("../dataLayer/modelsIndex");
 
 const redirect_uri =
   process.env.REDIRECT_URI || "http://localhost:3000/api/auth/callback";
@@ -19,7 +25,7 @@ authRouter.get("/callback", async (req, res, next) => {
         redirect_uri,
       }
     );
-
+    console.log(data);
     const { data: _user } = await Axios.get(
       "https://www.googleapis.com/oauth2/v2/userinfo",
       {
@@ -39,14 +45,25 @@ authRouter.get("/callback", async (req, res, next) => {
     if (_user.picture) {
       values.imageURL = _user.picture;
     }
-    console.log(values);
+    createUser({
+      userName: "testUsername",
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: "testPassword",
+      googleId: values.googleId,
+    });
     // call user methods to create or update a user
     // const [user] = await User.upsert(values, {
     //   returning: true,
     // });
-    req.session.userId = user.id;
-    console.log(req.session);
-    res.redirect("/pair");
+    // req.session.userId = user.id;
+    res.send(
+      `<script>
+      window.localStorage.setItem('token', '${data.id_token}');
+      window.location = '/#';
+      </script>`
+    );
   } catch (error) {
     next(error);
   }

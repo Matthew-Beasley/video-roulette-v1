@@ -7,13 +7,21 @@ const createUser = async ({
   lastName,
   email,
   password,
+  googleId,
 }) => {
   const sql = `
-  INSERT INTO users ("userName", "firstName", "lastName", email, password)
-  VALUES ($1, $2, $3, $4, $5)
+  INSERT INTO users ("userName", "firstName", "lastName", email, password, "googleId")
+  VALUES ($1, $2, $3, $4, $5, $6)
   RETURNING *;`;
   return (
-    await client.query(sql, [userName, firstName, lastName, email, password])
+    await client.query(sql, [
+      userName,
+      firstName,
+      lastName,
+      email,
+      password,
+      googleId,
+    ])
   ).rows[0];
 };
 

@@ -26,6 +26,17 @@ app.get("/", (req, res, next) => {
   }
 });
 
+app.use((req, res, next) => {
+  const token = req.headers.authorization;
+  if (token) {
+    return next();
+  } else {
+    const error = Error("not authorized");
+    error.status = 401;
+    next(error);
+  }
+});
+
 //maybe rethink this error handling
 app.use((req, res, next) => {
   next({
