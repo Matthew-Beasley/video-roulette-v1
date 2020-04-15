@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-// code from Justin's project
+// handleSubmit from Justin's project
 // const handleSubmit = async (ev) => {
 //   ev.preventDefault();
 //   try {
@@ -28,25 +28,23 @@ const Login = (handleSubmit) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const onSubmit = (ev) => {
-    ev.preventDefault();
-    console.log(email, password);
-    try {
-      axios.get("/api/auth", {
-        email,
-        password,
-      });
-    } catch (ex) {
-      setError(ex.response.data.message);
-      console.log(error);
-    }
-  };
+  // const onSubmit = (ev) => {
+  //   ev.preventDefault();
+  //   console.log(email, password);
+  //   try {
+  //     axios.get("/api/auth");
+  //   } catch (ex) {
+  //     setError(ex.response.data.message);
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <form
-      onSubmit={onSubmit}
+      // onSubmit={onSubmit}
       //substituted form action with onSubmit function
-      //method="GET" action={"/auth/google"}
+      method="GET"
+      action={"/api/auth"}
     >
       <div>
         <input
@@ -56,7 +54,6 @@ const Login = (handleSubmit) => {
           value={email}
           onChange={(ev) => setEmail(ev.target.value)}
           placeholder="Email Address"
-          required
         />
       </div>
       <div>
@@ -67,7 +64,6 @@ const Login = (handleSubmit) => {
           value={password}
           onChange={(ev) => setPassword(ev.target.value)}
           placeholder="Password"
-          required
         />
       </div>
       <div className="field is-centered">

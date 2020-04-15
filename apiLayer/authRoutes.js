@@ -39,11 +39,14 @@ authRouter.get("/callback", async (req, res, next) => {
     if (_user.picture) {
       values.imageURL = _user.picture;
     }
-
-    const [user] = await User.upsert(values, {
-      returning: true,
-    });
+    console.log(values);
+    // call user methods to create or update a user
+    // const [user] = await User.upsert(values, {
+    //   returning: true,
+    // });
     req.session.userId = user.id;
+    console.log(req.session);
+    res.redirect("/pair");
   } catch (error) {
     next(error);
   }

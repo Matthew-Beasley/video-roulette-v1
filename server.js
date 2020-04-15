@@ -8,7 +8,6 @@ const cors = require("cors");
 const _ = require("lodash");
 const { buildDB } = require("./dataLayer/modelsIndex");
 const { apiRouter } = require("./apiLayer/apiRoutes");
-const { authRouter } = require("./apiLayer/authRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -18,7 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 app.use("/dist", express.static(path.join(__dirname, "dist")));
 app.use("/api", apiRouter);
-app.use("/auth", authRouter);
 
 app.get("/", (req, res, next) => {
   try {
@@ -37,8 +35,7 @@ app.use((req, res, next) => {
 });
 app.use((err, req, res, next) => {
   res.status(err.status || 500).send({
-    // message: "piggly wiggly" || err.message || JSON.stringify(err),
-    message: "piggly wiggly",
+    message: err.message || JSON.stringify(err),
   });
 });
 
