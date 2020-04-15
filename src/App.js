@@ -29,7 +29,6 @@ const App = () => {
     history.push("/login");
   }
 
-  console.log(token);
   if (!token) {
     return (
       <div>
