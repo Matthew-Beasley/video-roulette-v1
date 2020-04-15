@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-const Register = ({ register }) => {
+const Register = () => {
   const onSubmit = (ev) => {
     ev.preventDefault();
     if (confirmPass !== password) {
       setError("Passwords do not match");
       return;
     }
-    //method
-    ({ userName, firstName, lastName, email, password }.catch((ex) =>
-      setError(ex.response.data.message)
-    ));
+    try {
+      axios.post(
+        "/api/users",
+        {
+          userName,
+          firstName,
+          lastName,
+          email,
+          password,
+        }.catch((ex) => setError(ex.response.data.message))
+      );
+    } catch (ex) {
+      setError(ex.response.data.message);
+      console.log(error);
+    }
   };
 
   return (

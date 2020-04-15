@@ -1,3 +1,7 @@
+if (!process.env.IS_PRODUCTION) {
+  require("dotenv").config();
+}
+
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -22,6 +26,17 @@ app.get("/", (req, res, next) => {
   }
 });
 
+app.use((req, res, next) => {
+  const token = req.headers.authorization;
+  if (token) {
+    return next();
+  } else {
+    const error = Error("not authorized");
+    error.status = 401;
+    next(error);
+  }
+});
+
 //maybe rethink this error handling
 app.use((req, res, next) => {
   next({
@@ -31,8 +46,7 @@ app.use((req, res, next) => {
 });
 app.use((err, req, res, next) => {
   res.status(err.status || 500).send({
-    // message: "piggly wiggly" || err.message || JSON.stringify(err),
-    message: "piggly wiggly",
+    message: err.message || JSON.stringify(err),
   });
 });
 
