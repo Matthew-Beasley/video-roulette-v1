@@ -1,9 +1,11 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
 
+
+const GroupVideo = () => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -16,7 +18,7 @@ const OT = require("@opentok/client");
   const visitedRooms = [];
   const messageHistory = [];
   let message;
-
+  const refMsgDiv = useRef(null);
 
   const getAuthKeys = async () => {
     const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms });
@@ -79,10 +81,16 @@ const OT = require("@opentok/client");
     // Receive a message and append it to the history
     session.on("signal:msg", function signalCallback(event) {
       const sender = event.from.connectionId === session.connection.connectionId ? "mine" : "theirs";
-      const msgTxt =
-      `${sender}:
-      ${event.data}`;
-      messageHistory.push(msgTxt);
+      var msg = refMsgDiv.current//.createElement("p");
+      msg.textContent += `
+      ${sender} \n
+      ${event.data}\n
+      \n
+      `;
+      console.log(msg)
+      //msg.className = event.from.connectionId === session.connection.connectionId ? "mine" : "theirs";
+      //msgHistory.appendChild(msg);
+      //msg.scrollIntoView();
     });
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
@@ -143,12 +151,11 @@ const OT = require("@opentok/client");
     initializeSession();
   };
 
-const GroupVideo = () => {
-  const [count, setCount] = useState(0)
+
   useEffect(() => {
-    console.log(count)
-    console.log(messageHistory)
-  }, [messageHistory.length])
+    const { current } = refMsgDiv;
+  })
+
 
   return (
     <div id="video-display-container">
@@ -159,16 +166,8 @@ const GroupVideo = () => {
         <div id="publisher" />
       </div>
       <div id="textchat-display">
-        <div id="maessage-box">
-          <ul id="text messages">
-            {messageHistory.map((msg) => {
-              return (
-                <li key={msg}>{msg}</li>
-              )
-            })}
-          </ul>
-        </div>
-        <form onSubmit={(ev) => { setCount(count + 1); sendMessage(ev) }}>
+        <div id="message-box" ref={refMsgDiv} />
+        <form onSubmit={(ev) =>  sendMessage(ev) }>
           <input
             type="text"
             placeholder="Input your text here"
