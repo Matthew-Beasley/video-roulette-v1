@@ -1,11 +1,11 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useEffect, useState, useRef } from "react";
+import React, { useRef } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
 
 
-const GroupVideo = () => {
+const ChatRoom = () => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -182,4 +182,4 @@ const GroupVideo = () => {
   )
 }
 
-export default GroupVideo;
+export default ChatRoom;
