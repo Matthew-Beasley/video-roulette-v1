@@ -1,5 +1,6 @@
 /* eslint-disable guard-for-in */
 const { client } = require("./client");
+const { hash } = require("./auth");
 
 const createUser = async ({
   userName,
@@ -13,13 +14,14 @@ const createUser = async ({
   INSERT INTO users ("userName", "firstName", "lastName", email, password, "googleId")
   VALUES ($1, $2, $3, $4, $5, $6)
   RETURNING *;`;
+  console.log("createUser");
   return (
     await client.query(sql, [
       userName,
       firstName,
       lastName,
       email,
-      password,
+      await hash(password),
       googleId,
     ])
   ).rows[0];
@@ -30,6 +32,7 @@ const readUsers = async () => {
   return (await client.query(sql)).rows;
 };
 
+//how to handle update password
 const updateUser = async (request) => {
   let set = "SET";
   let where = "WHERE";

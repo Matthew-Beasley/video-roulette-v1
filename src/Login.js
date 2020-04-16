@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Google from "./Google";
 
 // handleSubmit from Justin's project
 // const handleSubmit = async (ev) => {
@@ -40,41 +41,41 @@ const Login = (handleSubmit) => {
   // };
 
   return (
-    <form
+    <div>
+      <form
       // onSubmit={onSubmit}
       //substituted form action with onSubmit function
-      method="GET"
-      action={"/api/auth"}
-    >
-      <div>
-        <input
-          className="input"
-          name="email"
-          type="email"
-          value={email}
-          onChange={(ev) => setEmail(ev.target.value)}
-          placeholder="Email Address"
-        />
-      </div>
-      <div>
-        <input
-          className="input"
-          name="password"
-          type="password"
-          value={password}
-          onChange={(ev) => setPassword(ev.target.value)}
-          placeholder="Password"
-        />
-      </div>
-      <div className="field is-centered">
-        <div className="has-text-centered">
-          <button type="submit">Login</button>{" "}
+      // method="GET"
+      // action={"/api/auth"}
+      >
+        <div>
+          <input
+            className="input"
+            name="email"
+            type="email"
+            value={email}
+            onChange={(ev) => setEmail(ev.target.value)}
+            placeholder="Email Address"
+          />
         </div>
-      </div>
-      {/* <div>
-        <Google />
-      </div> */}
-    </form>
+        <div>
+          <input
+            className="input"
+            name="password"
+            type="password"
+            value={password}
+            onChange={(ev) => setPassword(ev.target.value)}
+            placeholder="Password"
+          />
+        </div>
+        <div className="field is-centered">
+          <div className="has-text-centered">
+            <button type="submit">Login</button>{" "}
+          </div>
+        </div>
+      </form>
+      <Google />
+    </div>
   );
 };
 
