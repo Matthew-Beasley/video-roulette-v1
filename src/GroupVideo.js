@@ -16,9 +16,9 @@ const GroupVideo = () => {
   let subscriber;
 
   const visitedRooms = [];
-  const messageHistory = [];
   let message;
   const refMsgDiv = useRef(null);
+  const refMsgBox = useRef(null);
 
   const getAuthKeys = async () => {
     const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms });
@@ -82,15 +82,12 @@ const GroupVideo = () => {
     session.on("signal:msg", function signalCallback(event) {
       const sender = event.from.connectionId === session.connection.connectionId ? "mine" : "theirs";
       var msg = refMsgDiv.current//.createElement("p");
-      msg.textContent += `
-      ${sender} \n
-      ${event.data}\n
-      \n
+      msg.innerText += `
+      ${sender}
+      ${event.data}
       `;
+      msg.scrollTop = msg.scrollHeight;
       console.log(msg)
-      //msg.className = event.from.connectionId === session.connection.connectionId ? "mine" : "theirs";
-      //msgHistory.appendChild(msg);
-      //msg.scrollIntoView();
     });
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
@@ -111,6 +108,8 @@ const GroupVideo = () => {
         message = "";
       }
     });
+    console.log("refMsgBox is ", refMsgBox)
+    refMsgBox.current.value = ""; //do I have to empty message here as well?
   }
 
 
@@ -146,21 +145,22 @@ const GroupVideo = () => {
   }
 
 
+  const sendStopSignal = async () => {
+    refMsgDiv.current.textarea = "";
+    await leaveSession();
+  }
+
+
   const joinRandomSession = async () => {
     await getAuthKeys();
     initializeSession();
   };
 
 
-  useEffect(() => {
-    const { current } = refMsgDiv;
-  })
-
-
   return (
     <div id="video-display-container">
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
-      <button type="button" onClick={() => leaveSession()}>Leave Session</button>
+      <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
@@ -171,7 +171,9 @@ const GroupVideo = () => {
           <input
             type="text"
             placeholder="Input your text here"
-            id="msgTxt"
+            id="msg-text"
+            ref={refMsgBox}
+            value={message}
             onChange={(ev) => { message = ev.target.value }} //create form component sovideo isn't interupted by rerender
           />
         </form>
