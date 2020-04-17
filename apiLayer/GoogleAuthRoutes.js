@@ -1,6 +1,7 @@
 const authRouter = require("express").Router();
 const qs = require("querystring");
 const Axios = require("axios");
+const uuid = require("uuid");
 const {
   createUser,
   readUsers,
@@ -39,6 +40,7 @@ authRouter.get("/callback", async (req, res, next) => {
       email: _user.email,
       firstName: _user.given_name,
       lastName: _user.family_name,
+      password: uuid.v4(),
     };
 
     if (_user.picture) {
@@ -49,7 +51,7 @@ authRouter.get("/callback", async (req, res, next) => {
       firstName: values.firstName,
       lastName: values.lastName,
       email: values.email,
-      password: "testPassword",
+      password: values.password,
       googleId: values.googleId,
     });
     // call user methods to create or update a user
