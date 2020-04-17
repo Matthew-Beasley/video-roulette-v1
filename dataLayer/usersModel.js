@@ -32,7 +32,6 @@ const readUsers = async () => {
   return (await client.query(sql)).rows;
 };
 
-//how to handle update password
 const updateUser = async (request) => {
   let set = "SET";
   let where = "WHERE";
