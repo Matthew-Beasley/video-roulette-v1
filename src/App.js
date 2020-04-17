@@ -54,7 +54,6 @@ const App = () => {
   //   exchangeTokenForAuth();
   // }, []);
   // && history.hash === "/login"
-  console.log(token);
   if (!token) {
     return (
       <div>
