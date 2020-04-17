@@ -146,7 +146,7 @@ const ChatRoom = () => {
 
 
   const sendStopSignal = async () => {
-    refMsgDiv.current.textarea = "";
+    refMsgDiv.current.innerText = "";
     await leaveSession();
   }
 
