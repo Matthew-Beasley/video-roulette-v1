@@ -36,7 +36,7 @@ const getUser = async (identifier) => {
   const key = Object.keys(identifier)[0];
   const sql = `
   SELECT * FROM users
-  WHERE ${key} = $1;`;
+  WHERE "${key}" = $1;`;
   return (await client.query(sql, [identifier[key]])).rows[0];
 }
 
@@ -74,6 +74,7 @@ const deleteUser = async ({ userName }) => {
 module.exports = {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
 };

@@ -29,7 +29,7 @@ usersRouter.get("/", async (req, res, next) => {
   }
 });
 
-usersRouter.post("/user", async (req, res, next) => {
+usersRouter.post("/getuser", async (req, res, next) => {
   try {
     const user = await getUser(req.body);
     res.status(200).send(user);

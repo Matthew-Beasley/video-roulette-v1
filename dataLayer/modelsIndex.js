@@ -1,6 +1,7 @@
 const {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
 } = require("./usersModel");
@@ -11,6 +12,7 @@ module.exports = {
   buildDB,
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
   findUserFromToken,
