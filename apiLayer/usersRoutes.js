@@ -8,7 +8,8 @@ const {
 
 const usersRouter = express.Router();
 
-usersRouter.post("/", async (req, res, next) => {
+//dont even think we are using this one
+usersRouter.post("/google", async (req, res, next) => {
   try {
     const data = await createUser(req.body);
     res.send(data);
