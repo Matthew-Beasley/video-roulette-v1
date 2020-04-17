@@ -2,8 +2,7 @@
 /* eslint-disable react/button-has-type */
 import React, { useState, useEffect } from "react";
 import { Route, Redirect, Link, useHistory } from "react-router-dom";
-import PairVideo from "./PairVideo";
-import GroupVideo from "./GroupVideo";
+import ChatRoom from "./ChatRoom";
 import Login from "./Login";
 
 const headers = () => {
@@ -29,7 +28,6 @@ const App = () => {
     history.push("/login");
   }
 
-  console.log(token);
   if (!token) {
     return (
       <div>
@@ -41,10 +39,8 @@ const App = () => {
     return (
       <div id="container">
         <button onClick={() => logout()}>logout</button>
-        <Link to="/pair">One on One Fun</Link>
-        <Link to="/group">Join a Crowd</Link>
-        <Route path="/pair" render={() => <PairVideo />} />
-        <Route path="/group" render={() => <GroupVideo />} />
+        <Link to="/chat">One on One Fun</Link>
+        <Route path="/chat" render={() => <ChatRoom />} />
       </div>
     );
   }

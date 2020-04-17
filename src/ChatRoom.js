@@ -1,12 +1,11 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useEffect, useState } from "react";
+import React, { useRef } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
-//const publisher = OT.initPublisher();
 
 
-const PairVideo = () => {
+const ChatRoom = () => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -16,9 +15,13 @@ const PairVideo = () => {
   let publisher;
   let subscriber;
 
+  const visitedRooms = [];
+  let message;
+  const refMsgDiv = useRef(null);
+  const refMsgBox = useRef(null);
 
   const getAuthKeys = async () => {
-    const response = await axios.post(`/api/opentok/chat/${2}`, { visitedRooms: [] });
+    const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms });
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -26,6 +29,7 @@ const PairVideo = () => {
       apiKey = response.data.apiKey;
       sessionId = response.data.sessionId;
       token = response.data.token;
+      visitedRooms.push(response.data.sessionId)
     }
   }
 
@@ -44,8 +48,8 @@ const PairVideo = () => {
     session.on("streamCreated", function (event) {
       subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
-        width: 400,
-        height: 400
+        width: 300,
+        height: 300
       }, handleError);
     });
 
@@ -66,25 +70,53 @@ const PairVideo = () => {
       }
     });
     // Receive a signal from peer
-    session.on("signal:msg", function signalCallback(event) {
+    session.on("signal:disconnect", function signalCallback(event) {
       if (event.data === "disconnect") {
-        leaveSession();
-        alert("You have been disconnected, you can join another room!")
+        alert("<username> has disconnected (on purpose I hope!)")
       }
       else {
         alert(event.data)
       }
+    });
+    // Receive a message and append it to the history
+    session.on("signal:msg", function signalCallback(event) {
+      const sender = event.from.connectionId === session.connection.connectionId ? "mine" : "theirs";
+      var msg = refMsgDiv.current//.createElement("p");
+      msg.innerText += `
+      ${sender}
+      ${event.data}
+      `;
+      msg.scrollTop = msg.scrollHeight;
+      console.log(msg)
     });
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
     });
   }
 
+  // Text chat
+  // Send a signal once the user enters data in the form
+  const sendMessage = (event) => {
+    event.preventDefault();
+    session.signal({
+      type: "msg",
+      data: message
+    }, function signalCallback(error) {
+      if (error) {
+        console.error("Error sending signal:", error.name, error.message);
+      } else {
+        message = "";
+      }
+    });
+    console.log("refMsgBox is ", refMsgBox)
+    refMsgBox.current.value = ""; //do I have to empty message here as well?
+  }
+
 
   const sendDisconnectSignal = () => {
     return new Promise((resolve, reject) => {
       session.signal({
-        type: "msg",
+        type: "disconnect",
         data: "disconnect"
       }, function signalCallback(error) {
         if (error) {
@@ -99,7 +131,12 @@ const PairVideo = () => {
 
 
   const leaveSession = async () => {
-    await axios.post(`/api/opentok/deletesession/${roomname}`);
+    await sendDisconnectSignal();
+    try {
+      await axios.post(`/api/opentok/decrimentsession/${roomname}`);
+    } catch (err) {
+      console.log(err);
+    }
     session.unsubscribe(subscriber);
     session.unpublish(publisher);
     session.disconnect();
@@ -109,7 +146,8 @@ const PairVideo = () => {
 
 
   const sendStopSignal = async () => {
-    await sendDisconnectSignal();
+    refMsgDiv.current.textarea = "";
+    await leaveSession();
   }
 
 
@@ -127,8 +165,21 @@ const PairVideo = () => {
         <div id="subscriber" />
         <div id="publisher" />
       </div>
+      <div id="textchat-display">
+        <div id="message-box" ref={refMsgDiv} />
+        <form onSubmit={(ev) =>  sendMessage(ev) }>
+          <input
+            type="text"
+            placeholder="Input your text here"
+            id="msg-text"
+            ref={refMsgBox}
+            value={message}
+            onChange={(ev) => { message = ev.target.value }} //create form component sovideo isn't interupted by rerender
+          />
+        </form>
+      </div>
     </div>
   )
 }
 
-export default PairVideo;
+export default ChatRoom;
