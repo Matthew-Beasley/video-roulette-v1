@@ -2,20 +2,19 @@
 /* eslint-disable react/button-has-type */
 import React, { useState, useEffect } from "react";
 import { Route, Redirect, Link, useHistory } from "react-router-dom";
-import PairVideo from "./PairVideo";
-import GroupVideo from "./GroupVideo";
+import ChatRoom from "./ChatRoom";
 import Login from "./Login";
 import axios from "axios";
 import CreateAccount from "./CreateAccount";
 
-const headers = () => {
-  const token = window.localStorage.getItem("token");
-  return {
-    headers: {
-      authorization: token,
-    },
-  };
-};
+// const headers = () => {
+//   const token = window.localStorage.getItem("token");
+//   return {
+//     headers: {
+//       authorization: token,
+//     },
+//   };
+// };
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -73,10 +72,8 @@ const App = () => {
     return (
       <div id="container">
         <button onClick={() => logout()}>logout</button>
-        <Link to="/pair">One on One Fun</Link>
-        <Link to="/group">Join a Crowd</Link>
-        <Route path="/pair" render={() => <PairVideo />} />
-        <Route path="/group" render={() => <GroupVideo />} />
+        <Link to="/chat">One on One Fun</Link>
+        <Route path="/chat" render={() => <ChatRoom />} />
       </div>
     );
   }
