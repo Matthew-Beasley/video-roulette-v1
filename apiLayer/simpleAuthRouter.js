@@ -4,6 +4,7 @@ const jwt = require("jwt-simple");
 const {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
   findUserFromToken,

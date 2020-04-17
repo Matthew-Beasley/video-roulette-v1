@@ -38,6 +38,7 @@ const App = () => {
 
   const logout = () => {
     window.localStorage.removeItem("token");
+    window.localStorage.removeItem("email")
     setToken("");
     history.push("/login");
   };
