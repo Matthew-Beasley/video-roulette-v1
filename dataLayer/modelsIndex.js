@@ -5,6 +5,7 @@ const {
   deleteUser,
 } = require("./usersModel");
 const { buildDB } = require("./buildDB");
+const { findUserFromToken, authenticate, compare, hash } = require("./auth");
 
 module.exports = {
   buildDB,
@@ -12,4 +13,8 @@ module.exports = {
   readUsers,
   updateUser,
   deleteUser,
+  findUserFromToken,
+  authenticate,
+  compare,
+  hash,
 };
