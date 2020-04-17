@@ -15,6 +15,8 @@ const buildDB = async () => {
     "googleId" VARCHAR(50)
   );`;
   await client.query(sql);
+
+  
 };
 
 module.exports = { buildDB };

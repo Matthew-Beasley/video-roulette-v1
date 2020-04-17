@@ -2,6 +2,7 @@ const express = require("express");
 const {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
 } = require("../dataLayer/modelsIndex");
@@ -23,6 +24,15 @@ usersRouter.get("/", async (req, res, next) => {
   try {
     const data = await readUsers();
     res.status(200).send(data);
+  } catch (error) {
+    next(error);
+  }
+});
+
+usersRouter.post("/user", async (req, res, next) => {
+  try {
+    const user = await getUser(req.body);
+    res.status(200).send(user);
   } catch (error) {
     next(error);
   }

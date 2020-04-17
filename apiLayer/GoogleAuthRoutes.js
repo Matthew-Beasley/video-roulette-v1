@@ -5,6 +5,7 @@ const uuid = require("uuid");
 const {
   createUser,
   readUsers,
+  getUser, 
   updateUser,
   deleteUser,
 } = require("../dataLayer/modelsIndex");
@@ -62,6 +63,7 @@ authRouter.get("/callback", async (req, res, next) => {
     res.send(
       `<script>
       window.localStorage.setItem('token', '${data.id_token}');
+      window.localStorage.setItem('email', '${values.email}');
       window.location = '/#';
       </script>`
     );
