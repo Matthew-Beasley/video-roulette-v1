@@ -6,6 +6,7 @@ import ChatRoom from "./ChatRoom";
 import Login from "./Login";
 import axios from "axios";
 import CreateAccount from "./CreateAccount";
+import CreateUsername from "./CreateUsername";
 
 // const headers = () => {
 //   const token = window.localStorage.getItem("token");
@@ -38,7 +39,7 @@ const App = () => {
 
   const logout = () => {
     window.localStorage.removeItem("token");
-    window.localStorage.removeItem("email")
+    window.localStorage.removeItem("email");
     setToken("");
     history.push("/login");
   };
@@ -57,15 +58,7 @@ const App = () => {
   if (!token) {
     return (
       <div>
-        <Redirect to="/login" />
-        <Route
-          path="/login"
-          render={() => <Login login={login} createAccount={createAccount} />}
-        />
-        <Route
-          path="/create-account"
-          render={() => <CreateAccount createAccount={createAccount} />}
-        />
+        <Login />
       </div>
     );
   } else {
@@ -74,6 +67,14 @@ const App = () => {
         <button onClick={() => logout()}>logout</button>
         <Link to="/chat">One on One Fun</Link>
         <Route path="/chat" render={() => <ChatRoom />} />
+        <Route
+          path="/createusername"
+          render={() => <CreateUsername history={history} />}
+        />
+        <Route
+          path="/login"
+          render={() => <Login login={login} createAccount={createAccount} />}
+        />
       </div>
     );
   }
