@@ -1,6 +1,7 @@
 const {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser
 } = require("../dataLayer/modelsIndex");
@@ -22,13 +23,15 @@ test("userModelscreateUser creates a user called chiefthedog", async () => {
     userName: "chiefthedog",
     firstName: "chief",
     lastName: "dog",
-    password: "password",
+    email: "chief the dog@email.com",
+    googleId: "1234567"
   });
   expect(chief).toEqual({
     userName: "chiefthedog",
     firstName: "chief",
     lastName: "dog",
-    password: "password",
+    email: "chief the dog@email.com",
+    googleId: "1234567"
   });
 });
 
@@ -37,14 +40,34 @@ test("userModels readUsers reads all users", async () => {
     userName: "chiefthedog",
     firstName: "chief",
     lastName: "dog",
-    password: "password",
+    email: "chief the dog@email.com",
+    googleId: "1234567"
   });
   const users = await readUsers();
   expect(users[0]).toEqual({
     userName: "chiefthedog",
     firstName: "chief",
     lastName: "dog",
-    password: "password",
+    email: "chief the dog@email.com",
+    googleId: "1234567"
+  });
+});
+
+test("userModels getUser returns the correct user", async () => {
+  const chief = await createUser({
+    userName: "chiefthedog",
+    firstName: "chief",
+    lastName: "dog",
+    email: "chiefthedog@email.com",
+    googleId: "1234567"
+  });
+  const user = await getUser({ email: "chiefthedog@email.com" });
+  expect(user).toEqual({
+    userName: "chiefthedog",
+    firstName: "chief",
+    lastName: "dog",
+    email: "chief the dog@email.com",
+    googleId: "1234567",
   });
 });
 
@@ -53,7 +76,8 @@ test("userModels updateUser updates firstName only", async () => {
     userName: "chiefthedog",
     firstName: "chief",
     lastName: "dog",
-    password: "password",
+    email: "chief the dog@email.com",
+    googleId: "1234567",
   });
   const jasper = await updateUser({
     userName: "chiefthedog",
@@ -63,7 +87,8 @@ test("userModels updateUser updates firstName only", async () => {
     userName: "chiefthedog",
     firstName: "jasper",
     lastName: "dog",
-    password: "password",
+    email: "chief the dog@email.com",
+    googleId: "1234567",
   });
 });
 
@@ -72,7 +97,8 @@ test("userModels deleteUser deletes a user called chiefthedog", async () => {
     userName: "chiefthedog",
     firstName: "chief",
     lastName: "dog",
-    password: "password",
+    email: "chief the dog@email.com",
+    googleId: "1234567",
   });
   await deleteUser({ userName: "chiefthedog" });
   const users = await readUsers();

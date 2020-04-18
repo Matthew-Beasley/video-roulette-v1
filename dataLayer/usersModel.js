@@ -32,6 +32,14 @@ const readUsers = async () => {
   return (await client.query(sql)).rows;
 };
 
+const getUser = async (identifier) => {
+  const key = Object.keys(identifier)[0];
+  const sql = `
+  SELECT * FROM users
+  WHERE "${key}" = $1;`;
+  return (await client.query(sql, [identifier[key]])).rows[0];
+};
+
 const updateUser = async (request) => {
   let set = "SET";
   let where = "WHERE";
@@ -65,6 +73,7 @@ const deleteUser = async ({ userName }) => {
 module.exports = {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
 };

@@ -1,8 +1,9 @@
-const io = require("socket.io");
+/*
 const axios = require("axios");
 const {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
 } = require("../dataLayer/modelsIndex");
@@ -37,3 +38,4 @@ test("User route should create a user", async () => {
     password: "password",
   });
 });
+*/

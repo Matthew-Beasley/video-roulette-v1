@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
 
@@ -14,11 +14,24 @@ const ChatRoom = () => {
   let session;
   let publisher;
   let subscriber;
+  let userObj;
 
   const visitedRooms = [];
   let message;
   const refMsgDiv = useRef(null);
   const refMsgBox = useRef(null);
+
+  const getUserObj = async () => {
+    const email = window.localStorage.getItem("email")
+    console.log("email from storage is ", email)
+    userObj = await axios.post("/api/users/getuser", { email });
+    userObj = userObj.data;
+    console.log("the userObj is ", userObj)
+  }
+
+  useEffect(() => {
+    getUserObj();
+  }, [])
 
   const getAuthKeys = async () => {
     const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms });
@@ -49,12 +62,14 @@ const ChatRoom = () => {
       subscriber = session.subscribe(event.stream, "subscriber", {
         insertMode: "append",
         width: 300,
-        height: 300
+        height: 300,
       }, handleError);
     });
 
     // Create a publisher
     publisher = OT.initPublisher("publisher", {
+      name: userObj.firstName,
+      style: { nameDisplayMode: "on" },
       insertMode: "append",
       width: "100%",
       height: "100%"

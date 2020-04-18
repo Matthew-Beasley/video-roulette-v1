@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { Route, Link } from "react-router-dom";
 import Google from "./Google";
+import CreateAccount from "./CreateAccount";
 
 // handleSubmit from Justin's project
 // const handleSubmit = async (ev) => {
@@ -25,28 +26,24 @@ import Google from "./Google";
 //   }
 // };
 
-const Login = (handleSubmit) => {
+const Login = ({ login, createAccount }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  // const onSubmit = (ev) => {
-  //   ev.preventDefault();
-  //   console.log(email, password);
-  //   try {
-  //     axios.get("/api/auth");
-  //   } catch (ex) {
-  //     setError(ex.response.data.message);
-  //     console.log(error);
-  //   }
-  // };
+  const onSubmit = (ev) => {
+    ev.preventDefault();
+    login({ email, password }).catch((ex) =>
+      setError(ex.response.data.message)
+    );
+  };
 
   return (
     <div>
       <form
-      // onSubmit={onSubmit}
-      //substituted form action with onSubmit function
-      // method="GET"
-      // action={"/api/auth"}
+        onSubmit={onSubmit}
+        //substituted form action with onSubmit function
+        // method="GET"
+        // action={"/api/auth"}
       >
         <div>
           <input
@@ -71,6 +68,11 @@ const Login = (handleSubmit) => {
         <div className="field is-centered">
           <div className="has-text-centered">
             <button type="submit">Login</button>{" "}
+            <Link to="/create-account">Create Account</Link>
+            <Route
+              path="/create-account"
+              render={() => <CreateAccount createAccount={createAccount} />}
+            />
           </div>
         </div>
       </form>
