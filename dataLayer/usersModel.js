@@ -14,7 +14,6 @@ const createUser = async ({
   INSERT INTO users ("userName", "firstName", "lastName", email, password, "googleId")
   VALUES ($1, $2, $3, $4, $5, $6)
   RETURNING *;`;
-  console.log("createUser");
   return (
     await client.query(sql, [
       userName,
@@ -46,11 +45,11 @@ const updateUser = async (request) => {
   let position = 1;
   const args = [];
   for (let key in request) {
-    if (key !== "userName") {
+    if (key !== "email") {
       set += ` "${key}" = $${position}`;
       args.push(request[key]);
-    } else if (key === "userName") {
-      where += ` "userName" = $${position}`;
+    } else if (key === "email") {
+      where += ` "email" = $${position}`;
       args.push(request[key]);
     }
     position++;
@@ -59,7 +58,7 @@ const updateUser = async (request) => {
     UPDATE users
     ${set}
     ${where}
-    RETURNING *`;
+    returning * ;`;
   return (await client.query(sql, args)).rows[0];
 };
 

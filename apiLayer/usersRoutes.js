@@ -40,7 +40,7 @@ usersRouter.post("/getuser", async (req, res, next) => {
 
 usersRouter.put("/", async (req, res, next) => {
   try {
-    const data = updateUser(req.body);
+    const data = await updateUser(req.body);
     res.status(200).send(data);
   } catch (error) {
     next(error);
