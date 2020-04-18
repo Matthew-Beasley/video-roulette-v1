@@ -21,12 +21,17 @@ const ChatRoom = () => {
   const refMsgDiv = useRef(null);
   const refMsgBox = useRef(null);
 
+  const getUserObj = async () => {
+    const email = window.localStorage.getItem("email")
+    console.log("email from storage is ", email)
+    userObj = await axios.post("/api/users/getuser", { email });
+    userObj = userObj.data;
+    console.log("the userObj is ", userObj)
+  }
+
   useEffect(() => {
-    axios.post("/api/users/getuser", { email: window.localStorage.getItem("email") })
-      .then(user => { userObj = user.data })
-      .catch()
-    console.log(userObj)
-  })
+    getUserObj();
+  }, [])
 
   const getAuthKeys = async () => {
     const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms });
@@ -63,7 +68,7 @@ const ChatRoom = () => {
 
     // Create a publisher
     publisher = OT.initPublisher("publisher", {
-      name: userObj.userName,
+      name: userObj.firstName,
       style: { nameDisplayMode: "on" },
       insertMode: "append",
       width: "100%",
