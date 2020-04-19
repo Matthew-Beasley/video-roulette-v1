@@ -66,7 +66,7 @@ const App = () => {
       <div id="container">
         <button onClick={() => logout()}>logout</button>
         <Link to="/chat">One on One Fun</Link>
-        <Route path="/chat" render={() => <ChatRoom />} />
+        <Route path="/chat" render={() => <ChatRoom logout={logout} />} />
         <Route
           path="/createusername"
           render={() => <CreateUsername history={history} />}
