@@ -5,7 +5,7 @@ import axios from "axios";
 const OT = require("@opentok/client");
 
 
-const ChatRoom = () => {
+const ChatRoom = ({ logout, history }) => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -27,9 +27,18 @@ const ChatRoom = () => {
     user = user.data;
   }
 
+
   useEffect(() => {
     getUser();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (history.action === "POP") {
+      sendStopSignal()
+      .then(result => console.log(result))
+    }
+  }, [history])
+
 
   const getAuthKeys = async () => {
     const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms, user });
@@ -116,6 +125,7 @@ const ChatRoom = () => {
       event.preventDefault();
     });
   }
+    
 
   // Text chat
   // Send a signal once the user enters data in the form
@@ -177,13 +187,23 @@ const ChatRoom = () => {
   const joinRandomSession = async () => {
     await getAuthKeys();
     initializeSession();
-  };
+  }
+
+
+  const goHome = async () => {
+    if (session) {
+      await sendStopSignal();
+    }
+    history.push("/login");
+    logout();
+  }
 
 
   return (
     <div id="video-display-container">
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
       <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
+      <button type="button" onClick={() => goHome()}>Logout</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
@@ -197,7 +217,7 @@ const ChatRoom = () => {
             id="msg-text"
             ref={refMsgBox}
             value={message}
-            onChange={(ev) => { message = ev.target.value }} //create form component sovideo isn't interupted by rerender
+            onChange={(ev) => { message = ev.target.value }} //create form component so video isn't interupted by rerender
           />
         </form>
       </div>

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Route, Link } from "react-router-dom";
-import Google from "./Google";
 import CreateAccount from "./CreateAccount";
 
 // handleSubmit from Justin's project
@@ -27,17 +26,8 @@ import CreateAccount from "./CreateAccount";
 // };
 
 const Login = ({ login, createAccount }) => {
-  //   const [email, setEmail] = useState("");
-  //   const [password, setPassword] = useState("");
-  //   const [error, setError] = useState("");
-  //   const onSubmit = (ev) => {
-  //     ev.preventDefault();
-  //     login({ email, password }).catch((ex) =>
-  //       setError(ex.response.data.message)
-  //     );
-  //   };
-
   return (
+<<<<<<< HEAD
     <div>
       <div className="text-center">
         <h1>
@@ -69,45 +59,27 @@ const Login = ({ login, createAccount }) => {
         <br />
       </div>
       <Google />
+=======
+  <div className="container">
+    <div className="row justify-content-center align-items-center">
+      <form method="GET" action="/api/auth">
+        <div className="field is-centered">
+          <p className="control has-text-centered">
+            <a className="btn btn-outline-dark" href="/api/auth" role="button">
+              <img
+                width="25px"
+                alt="Google sign-in"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
+              />{" "}
+              Login with Google
+            </a>
+          </p>
+        </div>
+      </form>
+>>>>>>> 875192398b2b7d7ab88a17a84b6248aabdaebc29
     </div>
-  );
-};
-/* <form
-          onSubmit={onSubmit}
-          //substituted form action with onSubmit function
-          // method="GET"
-          // action={"/api/auth"}
-        >
-          <div>
-            <input
-              className="input form-control"
-              name="email"
-              type="text"
-              value={email}
-              onChange={(ev) => setEmail(ev.target.value)}
-              placeholder="E-mail Address"
-            />
-          </div>
-          <div>
-            <input
-              className="input form-control"
-              name="password"
-              type="text"
-              value={password}
-              onChange={(ev) => setPassword(ev.target.value)}
-              placeholder="Password"
-            />
-          </div>
-          <div className="field is-centered">
-            <div className="has-text-centered">
-              <button type="submit">Login</button>{" "}
-              <Link to="/create-account">Create Account</Link>
-              <Route
-                path="/create-account"
-                render={() => <CreateAccount createAccount={createAccount} />}
-              />
-            </div>
-          </div>
-        </form> */
+  </div>
+  )
+}
 
 export default Login;
