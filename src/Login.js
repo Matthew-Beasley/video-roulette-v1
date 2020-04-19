@@ -38,45 +38,50 @@ const Login = ({ login, createAccount }) => {
   };
 
   return (
-    <div>
-      <form
-        onSubmit={onSubmit}
-        //substituted form action with onSubmit function
-        // method="GET"
-        // action={"/api/auth"}
-      >
-        <div>
-          <input
-            className="input"
-            name="email"
-            type="email"
-            value={email}
-            onChange={(ev) => setEmail(ev.target.value)}
-            placeholder="Email Address"
-          />
-        </div>
-        <div>
-          <input
-            className="input"
-            name="password"
-            type="password"
-            value={password}
-            onChange={(ev) => setPassword(ev.target.value)}
-            placeholder="Password"
-          />
-        </div>
-        <div className="field is-centered">
-          <div className="has-text-centered">
-            <button type="submit">Login</button>{" "}
-            <Link to="/create-account">Create Account</Link>
-            <Route
-              path="/create-account"
-              render={() => <CreateAccount createAccount={createAccount} />}
+    <div className="container">
+      <div className="row justify-content-center align-items-center">
+        <h1>LOGIN</h1>
+      </div>
+      <div className="row justify-content-center align-items-center">
+        <form
+          onSubmit={onSubmit}
+          //substituted form action with onSubmit function
+          // method="GET"
+          // action={"/api/auth"}
+        >
+          <div>
+            <input
+              className="input form-control"
+              name="email"
+              type="text"
+              value={email}
+              onChange={(ev) => setEmail(ev.target.value)}
+              placeholder="E-mail Address"
             />
           </div>
-        </div>
-      </form>
-      <Google />
+          <div>
+            <input
+              className="input form-control"
+              name="password"
+              type="text"
+              value={password}
+              onChange={(ev) => setPassword(ev.target.value)}
+              placeholder="Password"
+            />
+          </div>
+          <div className="field is-centered">
+            <div className="has-text-centered">
+              <button type="submit">Login</button>{" "}
+              <Link to="/create-account">Create Account</Link>
+              <Route
+                path="/create-account"
+                render={() => <CreateAccount createAccount={createAccount} />}
+              />
+            </div>
+          </div>
+        </form>
+        <Google />
+      </div>
     </div>
   );
 };
