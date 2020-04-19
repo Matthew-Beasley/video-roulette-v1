@@ -49,17 +49,20 @@ openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
 openTokRouter.post("/chat/:memberscount", function (req, res, next) {
   let sessionId;
   let token;
+  const tokenOptions = {};
   const { memberscount } = req.params;
-  const { visitedRooms } = req.body;
+  const { visitedRooms, user } = req.body;
   let roomName = findAvailableRoom(memberscount, visitedRooms);
 
   // we should now have an available room, if not drop down to create a room
   if (roomName) {
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
-
     // generate token
-    token = opentok.generateToken(sessionId);
+    tokenOptions.role = "publisher";
+    tokenOptions.data = `{"userName":"${user.userName}", "email":"${user.email}"}`;
+    console.log(tokenOptions)
+    token = opentok.generateToken(sessionId, tokenOptions);
     res.setHeader("Content-Type", "application/json");
     res.send({
       apiKey: apiKey,
@@ -82,7 +85,10 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
       };
 
       // generate token
-      token = opentok.generateToken(session.sessionId);
+      console.log("user is ", user)
+      tokenOptions.role = "publisher";
+      tokenOptions.data = `{"userName":"${user.userName}", "email":"${user.email}"}`;
+      token = opentok.generateToken(session.sessionId, tokenOptions);
       res.setHeader("Content-Type", "application/json");
       res.send({
         apiKey: apiKey,

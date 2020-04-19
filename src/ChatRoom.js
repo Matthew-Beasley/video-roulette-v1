@@ -14,27 +14,25 @@ const ChatRoom = () => {
   let session;
   let publisher;
   let subscriber;
-  let userObj;
-
+  let user;
+  const connectedUsers = {};
   const visitedRooms = [];
   let message;
   const refMsgDiv = useRef(null);
   const refMsgBox = useRef(null);
 
-  const getUserObj = async () => {
+  const getUser = async () => {
     const email = window.localStorage.getItem("email")
-    console.log("email from storage is ", email)
-    userObj = await axios.post("/api/users/getuser", { email });
-    userObj = userObj.data;
-    console.log("the userObj is ", userObj)
+    user = await axios.post("/api/users/getuser", { email });
+    user = user.data;
   }
 
   useEffect(() => {
-    getUserObj();
+    getUser();
   }, [])
 
   const getAuthKeys = async () => {
-    const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms });
+    const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms, user });
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -68,7 +66,7 @@ const ChatRoom = () => {
 
     // Create a publisher
     publisher = OT.initPublisher("publisher", {
-      name: userObj.firstName,
+      name: user.userName,
       style: { nameDisplayMode: "on" },
       insertMode: "append",
       width: "100%",
@@ -84,10 +82,20 @@ const ChatRoom = () => {
         session.publish(publisher, handleError);
       }
     });
+    session.on("connectionCreated", function connectionCreated(event) {
+      const userData = JSON.parse(event.connection.data)
+      connectedUsers[userData.userName] = userData;
+      //console.log("connectedUsers after create ", connectedUsers)
+    });
+    session.on("connectionDestroyed", function connectionDestroyed(event) {
+      const userData = JSON.parse(event.connection.data);
+      delete connectedUsers[userData.userName];
+      //console.log("connectedUsers after delete ", connectedUsers)
+    });
     // Receive a signal from peer
     session.on("signal:disconnect", function signalCallback(event) {
       if (event.data === "disconnect") {
-        alert("<username> has disconnected (on purpose I hope!)")
+        alert(`${user.userName} has disconnected (on purpose I hope!)`)
       }
       else {
         alert(event.data)
