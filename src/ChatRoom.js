@@ -5,7 +5,7 @@ import axios from "axios";
 const OT = require("@opentok/client");
 
 
-const ChatRoom = () => {
+const ChatRoom = ({ logout }) => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -177,14 +177,21 @@ const ChatRoom = () => {
   const joinRandomSession = async () => {
     await getAuthKeys();
     initializeSession();
-  };
+  }
+
+
+  const goHome = () => {
+    sendStopSignal();
+    history.push("/login");
+    logout();
+  } 
 
 
   return (
     <div id="video-display-container">
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
       <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
-      <button type="button" onClick={() => { sendStopSignal(); history.push("/login")}}>Back to Login</button>
+      <button type="button" onClick={() => goHome()}>Logout</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
