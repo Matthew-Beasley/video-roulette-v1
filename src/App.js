@@ -57,12 +57,8 @@ const App = () => {
   // && history.hash === "/login"
   if (!token) {
     return (
-      <div className="container-lg h-100">
-        <div className="row h-100">
-          <div className="my-auto col-sm-12">
-            <Login />
-          </div>
-        </div>
+      <div>
+        <Login />
       </div>
     );
   } else {
