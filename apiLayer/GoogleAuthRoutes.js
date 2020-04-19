@@ -72,7 +72,7 @@ authRouter.get("/callback", async (req, res, next) => {
         `<script>
       window.localStorage.setItem('token', '${data.id_token}');
       window.localStorage.setItem('email', '${values.email}');
-      window.location = '/#';
+      window.location = '/#/chat';
       </script>`
       );
     }
