@@ -41,26 +41,26 @@ const Login = ({ login, createAccount }) => {
     <div>
       <div className="text-center">
         <h1>
-          <ul class="c-rainbow">
-            <li class="c-rainbow__layer c-rainbow__layer--white">
+          <ul className="c-rainbow">
+            <li className="c-rainbow__layer c-rainbow__layer--white">
               PARTY WITH FRIENDS YOU'VE NEVER MET
             </li>
-            <li class="c-rainbow__layer c-rainbow__layer--orange">
+            <li className="c-rainbow__layer c-rainbow__layer--orange">
               PARTY WITH FRIENDS YOU'VE NEVER MET
             </li>
-            <li class="c-rainbow__layer c-rainbow__layer--red">
+            <li className="c-rainbow__layer c-rainbow__layer--red">
               PARTY WITH FRIENDS YOU'VE NEVER MET
             </li>
-            <li class="c-rainbow__layer c-rainbow__layer--violet">
+            <li className="c-rainbow__layer c-rainbow__layer--violet">
               PARTY WITH FRIENDS YOU'VE NEVER MET
             </li>
-            <li class="c-rainbow__layer c-rainbow__layer--blue">
+            <li className="c-rainbow__layer c-rainbow__layer--blue">
               PARTY WITH FRIENDS YOU'VE NEVER MET
             </li>
-            <li class="c-rainbow__layer c-rainbow__layer--green">
+            <li className="c-rainbow__layer c-rainbow__layer--green">
               PARTY WITH FRIENDS YOU'VE NEVER MET
             </li>
-            <li class="c-rainbow__layer c-rainbow__layer--yellow">
+            <li className="c-rainbow__layer c-rainbow__layer--yellow">
               PARTY WITH FRIENDS YOU'VE NEVER MET
             </li>
           </ul>
