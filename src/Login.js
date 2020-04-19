@@ -27,23 +27,52 @@ import CreateAccount from "./CreateAccount";
 // };
 
 const Login = ({ login, createAccount }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const onSubmit = (ev) => {
-    ev.preventDefault();
-    login({ email, password }).catch((ex) =>
-      setError(ex.response.data.message)
-    );
-  };
+  //   const [email, setEmail] = useState("");
+  //   const [password, setPassword] = useState("");
+  //   const [error, setError] = useState("");
+  //   const onSubmit = (ev) => {
+  //     ev.preventDefault();
+  //     login({ email, password }).catch((ex) =>
+  //       setError(ex.response.data.message)
+  //     );
+  //   };
 
   return (
-    <div className="container">
-      <div className="row justify-content-center align-items-center">
-        <h1>LOGIN</h1>
+    <div>
+      <div className="text-center">
+        <h1>
+          <ul class="c-rainbow">
+            <li class="c-rainbow__layer c-rainbow__layer--white">
+              PARTY WITH FRIENDS YOU'VE NEVER MET
+            </li>
+            <li class="c-rainbow__layer c-rainbow__layer--orange">
+              PARTY WITH FRIENDS YOU'VE NEVER MET
+            </li>
+            <li class="c-rainbow__layer c-rainbow__layer--red">
+              PARTY WITH FRIENDS YOU'VE NEVER MET
+            </li>
+            <li class="c-rainbow__layer c-rainbow__layer--violet">
+              PARTY WITH FRIENDS YOU'VE NEVER MET
+            </li>
+            <li class="c-rainbow__layer c-rainbow__layer--blue">
+              PARTY WITH FRIENDS YOU'VE NEVER MET
+            </li>
+            <li class="c-rainbow__layer c-rainbow__layer--green">
+              PARTY WITH FRIENDS YOU'VE NEVER MET
+            </li>
+            <li class="c-rainbow__layer c-rainbow__layer--yellow">
+              PARTY WITH FRIENDS YOU'VE NEVER MET
+            </li>
+          </ul>
+        </h1>
+
+        <br />
       </div>
-      <div className="row justify-content-center align-items-center">
-        <form
+      <Google />
+    </div>
+  );
+};
+/* <form
           onSubmit={onSubmit}
           //substituted form action with onSubmit function
           // method="GET"
@@ -79,11 +108,6 @@ const Login = ({ login, createAccount }) => {
               />
             </div>
           </div>
-        </form>
-        <Google />
-      </div>
-    </div>
-  );
-};
+        </form> */
 
 export default Login;
