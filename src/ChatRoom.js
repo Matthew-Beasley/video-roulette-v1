@@ -5,7 +5,7 @@ import axios from "axios";
 const OT = require("@opentok/client");
 
 
-const ChatRoom = ({ logout }) => {
+const ChatRoom = ({ logout, history }) => {
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -27,9 +27,18 @@ const ChatRoom = ({ logout }) => {
     user = user.data;
   }
 
+
   useEffect(() => {
     getUser();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if (history.action === "POP") {
+      sendStopSignal()
+      .then(result => console.log(result))
+    }
+  }, [history])
+
 
   const getAuthKeys = async () => {
     const response = await axios.post(`/api/opentok/chat/${5}`, { visitedRooms, user });
@@ -116,6 +125,7 @@ const ChatRoom = ({ logout }) => {
       event.preventDefault();
     });
   }
+    
 
   // Text chat
   // Send a signal once the user enters data in the form
@@ -180,11 +190,13 @@ const ChatRoom = ({ logout }) => {
   }
 
 
-  const goHome = () => {
-    sendStopSignal();
+  const goHome = async () => {
+    if (session) {
+      await sendStopSignal();
+    }
     history.push("/login");
     logout();
-  } 
+  }
 
 
   return (
