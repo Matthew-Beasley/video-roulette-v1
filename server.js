@@ -52,16 +52,16 @@ app.use((err, req, res, next) => {
 });
 
 buildDB(); // Not crazy about blowing the db away but I guess it's best for dev
-// const func = async () => {
-//   await createUser({
-//     userName: "changeMe",
-//     firstName: "dave",
-//     lastName: "theBrave",
-//     email: "test@gmail.com",
-//     password: "test",
-//     googleId: "1234",
-//   });
-// };
-// func();
-
+ /*const func = async () => {
+   await createUser({
+     userName: "changeMe",
+     firstName: "dave",
+     lastName: "theBrave",
+     email: "test@gmail.com",
+     password: "test",
+     googleId: "1234",
+   });
+ };
+ func();
+*/
 app.listen(PORT, () => console.log("Listening on PORT ", PORT));
