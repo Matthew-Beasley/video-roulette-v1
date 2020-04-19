@@ -184,6 +184,7 @@ const ChatRoom = () => {
     <div id="video-display-container">
       <button type="button" onClick={() => joinRandomSession()}>Join Random Session</button>
       <button type="button" onClick={() => sendStopSignal()}>Leave Session</button>
+      <button type="button" onClick={() => { sendStopSignal(); history.push("/login")}}>Back to Login</button>
       <div id="videos">
         <div id="subscriber" />
         <div id="publisher" />
@@ -197,7 +198,7 @@ const ChatRoom = () => {
             id="msg-text"
             ref={refMsgBox}
             value={message}
-            onChange={(ev) => { message = ev.target.value }} //create form component sovideo isn't interupted by rerender
+            onChange={(ev) => { message = ev.target.value }} //create form component so video isn't interupted by rerender
           />
         </form>
       </div>
