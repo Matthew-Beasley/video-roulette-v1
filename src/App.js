@@ -2,18 +2,20 @@
 /* eslint-disable react/button-has-type */
 import React, { useState, useEffect } from "react";
 import { Route, Redirect, Link, useHistory } from "react-router-dom";
-import PairVideo from "./PairVideo";
-import GroupVideo from "./GroupVideo";
+import ChatRoom from "./ChatRoom";
 import Login from "./Login";
+import axios from "axios";
+import CreateAccount from "./CreateAccount";
+import CreateUsername from "./CreateUsername";
 
-const headers = () => {
-  const token = window.localStorage.getItem("token");
-  return {
-    headers: {
-      authorization: token,
-    },
-  };
-};
+// const headers = () => {
+//   const token = window.localStorage.getItem("token");
+//   return {
+//     headers: {
+//       authorization: token,
+//     },
+//   };
+// };
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -23,31 +25,57 @@ const App = () => {
     setToken(window.localStorage.getItem("token"));
   }, []);
 
-  function logout() {
+  // const exchangeTokenForAuth = async () => {
+  //   const response = await axios.get("/api/simpleauth", headers());
+  //   setAuth(response.data);
+  // };
+
+  const login = async (credentials) => {
+    const _token = (await axios.post("/api/simpleauth", credentials)).data
+      .token;
+    window.localStorage.setItem("token", _token);
+    // exchangeTokenForAuth();
+  };
+
+  const logout = () => {
     window.localStorage.removeItem("token");
+    window.localStorage.removeItem("email");
     setToken("");
     history.push("/login");
-  }
+  };
 
-  console.log(token);
+  const createAccount = async (newUser) => {
+    const response = (await axios.post("/api/simpleauth/users", newUser)).data;
+    window.localStorage.setItem("token", response.token);
+    // setAuth(response.user);
+    // setError("");
+  };
+
+  // useEffect(() => {
+  //   exchangeTokenForAuth();
+  // }, []);
+  // && history.hash === "/login"
   if (!token) {
     return (
       <div>
-        <Redirect to="/login" />
-        <Route path="/login" render={() => <Login />} />
+        <Login />
       </div>
     );
   } else {
     return (
       <div id="container">
-        <button onClick={() => logout()}>logout</button>
-        <Link to="/pair">One on One Fun</Link>
-        <Link to="/group">Join a Crowd</Link>
-        <Route path="/pair" render={() => <PairVideo />} />
-        <Route path="/group" render={() => <GroupVideo />} />
+        <Route path="/chat" render={() => <ChatRoom logout={logout} history={history} />} />
+        <Route
+          path="/createusername"
+          render={() => <CreateUsername history={history} />}
+        />
+        <Route
+          path="/login"
+          render={() => <Login login={login} createAccount={createAccount} />}
+        />
       </div>
     );
   }
-}
+};
 
 export default App;

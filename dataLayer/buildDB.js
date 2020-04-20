@@ -11,8 +11,8 @@ const buildDB = async () => {
     "firstName" VARCHAR(100) NOT NULL CHECK(char_length("firstName") > 0),
     "lastName" VARCHAR(100) NOT NULL CHECK(char_length("lastName") > 0),
     email VARCHAR(100) NOT NULL CHECK(char_length(email) > 0),
-    password VARCHAR(50),
-    "googleId" VARCHAR(50)
+    password VARCHAR(100),
+    "googleId" VARCHAR(100)
   );`;
   await client.query(sql);
 };

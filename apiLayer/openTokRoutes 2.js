@@ -13,6 +13,7 @@ var opentok = new OpenTok(apiKey, secret);
 var roomToSessionIdDictionary = {};
 
 const findAvailableRoom = (participants, visitedRooms) => {
+  console.log("visitedRooms in the findAvaliableRoom is ", visitedRooms)
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
   for (let i = 0; i < candidateRooms.length; i++) {
     if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < participants &&
@@ -39,8 +40,10 @@ openTokRouter.post("/deletesession/:roomname", (req, res, next) => {
 openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
   const { roomname } = req.params;
   roomToSessionIdDictionary[roomname].connectionCount--;
+  console.log("room decrimented to ", roomToSessionIdDictionary[roomname].connectionCount)
   if (roomToSessionIdDictionary[roomname].connectionCount <= 0) {
     delete roomToSessionIdDictionary[roomname];
+    console.log("room deleted")
   }
   res.status(201).send();
 });
@@ -49,20 +52,17 @@ openTokRouter.post("/decrimentsession/:roomname", (req, res, next) => {
 openTokRouter.post("/chat/:memberscount", function (req, res, next) {
   let sessionId;
   let token;
-  const tokenOptions = {};
   const { memberscount } = req.params;
-  const { visitedRooms, user } = req.body;
+  const { visitedRooms } = req.body;
   let roomName = findAvailableRoom(memberscount, visitedRooms);
 
   // we should now have an available room, if not drop down to create a room
   if (roomName) {
     roomToSessionIdDictionary[roomName].connectionCount++;
     sessionId = roomToSessionIdDictionary[roomName].sessionId;
+
     // generate token
-    tokenOptions.role = "publisher";
-    tokenOptions.data = `{"userName":"${user.userName}", "email":"${user.email}"}`;
-    console.log(tokenOptions)
-    token = opentok.generateToken(sessionId, tokenOptions);
+    token = opentok.generateToken(sessionId);
     res.setHeader("Content-Type", "application/json");
     res.send({
       apiKey: apiKey,
@@ -85,10 +85,7 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
       };
 
       // generate token
-      console.log("user is ", user)
-      tokenOptions.role = "publisher";
-      tokenOptions.data = `{"userName":"${user.userName}", "email":"${user.email}"}`;
-      token = opentok.generateToken(session.sessionId, tokenOptions);
+      token = opentok.generateToken(session.sessionId);
       res.setHeader("Content-Type", "application/json");
       res.send({
         apiKey: apiKey,

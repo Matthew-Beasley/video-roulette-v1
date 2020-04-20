@@ -1,9 +1,11 @@
 const authRouter = require("express").Router();
 const qs = require("querystring");
 const Axios = require("axios");
+const uuid = require("uuid");
 const {
   createUser,
   readUsers,
+  getUser,
   updateUser,
   deleteUser,
 } = require("../dataLayer/modelsIndex");
@@ -39,30 +41,41 @@ authRouter.get("/callback", async (req, res, next) => {
       email: _user.email,
       firstName: _user.given_name,
       lastName: _user.family_name,
+      password: uuid.v4(),
     };
 
     if (_user.picture) {
       values.imageURL = _user.picture;
     }
-    createUser({
-      userName: "testUsername",
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      password: "testPassword",
-      googleId: values.googleId,
-    });
-    // call user methods to create or update a user
-    // const [user] = await User.upsert(values, {
-    //   returning: true,
-    // });
-    // req.session.userId = user.id;
-    res.send(
-      `<script>
+
+    //may have to change values.email to values.googleId in case someone signs up for simple with gmail
+    const user = await getUser({ email: values.email });
+
+    if (user === undefined) {
+      createUser({
+        userName: uuid.v4(),
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        googleId: values.googleId,
+      });
+      res.send(
+        `<script>
+        window.localStorage.setItem('token', '${data.id_token}');
+        window.localStorage.setItem('email', '${values.email}');
+        window.location = '/#/createusername';
+        </script>`
+      );
+    } else {
+      res.send(
+        `<script>
       window.localStorage.setItem('token', '${data.id_token}');
-      window.location = '/#';
+      window.localStorage.setItem('email', '${values.email}');
+      window.location = '/#/chat';
       </script>`
-    );
+      );
+    }
   } catch (error) {
     next(error);
   }
