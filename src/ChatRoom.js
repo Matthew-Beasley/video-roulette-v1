@@ -207,7 +207,7 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   return (
-    <div id="video-display-container">
+    <div id="container">
       <button type="button" onClick={() => joinRandomSession()}>
         Join Random Session
       </button>
@@ -217,7 +217,7 @@ const ChatRoom = ({ logout, history }) => {
       <button type="button" onClick={() => goHome()}>
         Logout
       </button>
-      <div id="videos">
+      <div id="rightBottomCorner">
         <div id="subscriber" />
         <div id="publisher" />
       </div>
