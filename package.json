@@ -31,6 +31,7 @@
     "axios": "^0.19.2",
     "bcrypt": "^4.0.1",
     "cors": "^2.8.5",
+    "css-loader": "^3.5.2",
     "express": "^4.17.1",
     "faker": "^4.1.0",
     "fs": "0.0.1-security",
@@ -41,6 +42,9 @@
     "opentok": "^2.9.2",
     "pg": "^8.0.0",
     "query-string": "^6.9.3",
-    "react-use-opentok": "^2.2.3"
+    "react-use-opentok": "^2.2.3",
+    "sass": "^1.26.3",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.4"
   }
 }
