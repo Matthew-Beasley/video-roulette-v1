@@ -121,11 +121,8 @@ const ChatRoom = ({ logout, history }) => {
     });
     // Receive a message and append it to the history
     session.on("signal:msg", function signalCallback(event) {
-      const sender =
-        event.from.connectionId === session.connection.connectionId
-          ? "mine"
-          : "theirs";
-      var msg = refMsgDiv.current; //.createElement("p");
+      const sender = JSON.parse(session.connection.data).userName;
+      const msg = refMsgDiv.current; //.createElement("p");
       msg.innerText += `
       ${sender}
       ${event.data}
