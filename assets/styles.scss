@@ -4,8 +4,8 @@ $root: ".c-rainbow";
   --color-background: #31037d;
 
   --axis-x: 1px;
-  --axis-y: 1rem;
-  --delay: 15;
+  --axis-y: 5px;
+  --delay: 7;
 
   --color-black: #000;
   --color-white: #fff;
@@ -26,13 +26,9 @@ body {
 }
 
 body {
-  background-color: var(--color-background);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-family: var(--font-name);
 
   height: 100vh;
 }
