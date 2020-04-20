@@ -36,6 +36,10 @@ const ChatRoom = ({ logout, history }) => {
     }
   }, [history]);
 
+  window.onunload = function () {
+    logout();
+  };
+
   const getAuthKeys = async () => {
     const response = await axios.post(`/api/opentok/chat/${5}`, {
       visitedRooms,
@@ -199,7 +203,7 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   const goHome = async () => {
-    if (session) {
+    if (session !== undefined && session.connection) {
       await sendStopSignal();
     }
     logout();
