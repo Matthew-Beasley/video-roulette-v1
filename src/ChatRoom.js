@@ -182,11 +182,13 @@ const ChatRoom = ({ logout, history }) => {
     } catch (err) {
       console.log(err);
     }
-    session.unsubscribe(subscriber);
+    if (subscriber) {
+      session.unsubscribe(subscriber);
+      subscriber.destroy();
+    }
     session.unpublish(publisher);
     session.disconnect();
     publisher.destroy();
-    subscriber.destroy();
   };
 
   const sendStopSignal = async () => {
