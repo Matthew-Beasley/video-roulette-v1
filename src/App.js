@@ -39,9 +39,14 @@ const App = () => {
   const logout = () => {
     window.localStorage.removeItem("token");
     window.localStorage.removeItem("email");
-    setToken("");
+    window.localStorage.removeItem("userId");
     history.push("/login");
   };
+
+  window.addEventListener("beforeunload", (ev) => {
+    ev.preventDefault();
+    window.localStorage.removeItem("token");
+  });
 
   // const createAccount = async (newUser) => {
   //   const response = (await axios.post("/api/simpleauth/users", newUser)).data;

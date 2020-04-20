@@ -21,11 +21,11 @@ const CreateUserName = ({ history }) => {
   };
 
   return (
-    <div>
+    <div className="text-center">
       <form onSubmit={onSubmit}>
-        <h2>Create Username</h2>
+        <h1>CREATE USERNAME</h1>
         <div>{error}</div>
-        <div>Username</div>
+
         <input
           value={userName}
           onChange={(ev) => setUserName(ev.target.value)}
