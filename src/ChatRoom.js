@@ -19,6 +19,7 @@ const ChatRoom = ({ logout, history }) => {
   let message;
   const refMsgDiv = useRef(null);
   const refMsgBox = useRef(null);
+  const refJoinBttn = useRef(null);
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
@@ -78,8 +79,7 @@ const ChatRoom = ({ logout, history }) => {
         handleError
       );
     });
-
-    // Create a publisher
+      // Create a publisher
     publisher = OT.initPublisher(
       "publisher",
       {
@@ -155,7 +155,6 @@ const ChatRoom = ({ logout, history }) => {
         }
       }
     );
-    console.log("refMsgBox is ", refMsgBox);
     refMsgBox.current.value = ""; //do I have to empty message here as well?
   };
 
@@ -179,6 +178,7 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   const leaveSession = async () => {
+    refJoinBttn.current.disabled = false;
     await sendDisconnectSignal();
     try {
       await axios.post(`/api/opentok/decrimentsession/${roomname}`);
@@ -198,6 +198,7 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   const joinRandomSession = async () => {
+    refJoinBttn.current.disabled = true;
     await getAuthKeys();
     initializeSession();
   };
@@ -212,7 +213,7 @@ const ChatRoom = ({ logout, history }) => {
 
   return (
     <div id="container">
-      <button type="button" onClick={() => joinRandomSession()}>
+      <button type="button" ref={refJoinBttn} onClick={() => joinRandomSession()}>
         Join Random Session
       </button>
       <button type="button" onClick={() => sendStopSignal()}>
