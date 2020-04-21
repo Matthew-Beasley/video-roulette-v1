@@ -21,7 +21,7 @@ const ChatRoom = ({ logout, history }) => {
   const refMsgDiv = useRef(null);
   const refMsgBox = useRef(null);
   const refJoinBttn = useRef(null);
-  const ref2rdo = useRef(null);
+  const refCountSlct = useRef(null);
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
@@ -44,16 +44,14 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   const getAuthKeys = async () => {
-    let chatCount;
-    if (ref2rdo.current.checked) {
-      chatCount = 2;
-    } else {
-      chatCount = 9;
-    }
-    const response = await axios.post(`/api/opentok/chat/${chatCount}`, {
-      visitedRooms,
-      user,
-    });
+    console.log(refCountSlct.current.value);
+    const response = await axios.post(
+      `/api/opentok/chat/${refCountSlct.current.value}`,
+      {
+        visitedRooms,
+        user,
+      }
+    );
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -261,7 +259,7 @@ const ChatRoom = ({ logout, history }) => {
               </a>
             </li>
             <li className="nav-item dropdown">
-              <a
+             {/* <a
                 className="nav-link dropdown-toggle"
                 href="#/chat"
                 id="navbarDropdownMenuLink"
@@ -276,17 +274,26 @@ const ChatRoom = ({ logout, history }) => {
                 className="dropdown-menu"
                 aria-labelledby="navbarDropdownMenuLink"
               >
-                <a className="dropdown-item" href="#">
+               <a className="dropdown-item" href="#">
                   One On One
                 </a>
-                <a className="dropdown-item" href="#">
-                  A Crowd Is Fun
+                  <a className="dropdown-item" href="#">
+                    A Crowd Is Fun
                 </a>
-                <div className="dropdown-divider" />
-                <a className="dropdown-item" href="#">
-                  Something else
-                </a>
-              </div>
+                  <div className="dropdown-divider" />
+                  <a className="dropdown-item" href="#">
+                    Something else
+                </a> */}
+                <select id="participants" ref={refCountSlct} >
+                  <optgroup label="Participants">
+                    <option value="2">One on One</option>
+                    <option value="9">A Crowd is Fun</option>
+                  </optgroup>
+                  <optgroup label="something else">
+                    <option value="something">Something else</option>
+                  </optgroup>
+                </select>
+             { /*</li></div>*/}
             </li>
           </ul>
           <form className="form-inline my-2 my-lg-0">
@@ -314,17 +321,6 @@ const ChatRoom = ({ logout, history }) => {
       <button type="button" onClick={() => sendStopSignal()}>
         Leave The Party
       </button>
-      <input
-        type="radio"
-        id="2"
-        ref={ref2rdo}
-        defaultChecked={true}
-        name="crowd"
-        value="2"
-      />
-      <label htmlFor="2">One on One</label>
-      <input type="radio" id="crowd" name="crowd" value="crowd" />
-      <label htmlFor="more">A Crowd is Fun</label>
       <div id="videoContainer">
         <div id="rightBottomCorner">
           <div id="subscriber" />
