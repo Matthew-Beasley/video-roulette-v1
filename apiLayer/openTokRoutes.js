@@ -15,8 +15,7 @@ var roomToSessionIdDictionary = {};
 const findAvailableRoom = (participants, visitedRooms) => {
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
   for (let i = 0; i < candidateRooms.length; i++) {
-    if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < participants &&
-        visitedRooms.includes(roomToSessionIdDictionary[candidateRooms[i]].sessionId) !== true) {
+    if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < participants) {
       return candidateRooms[i];
     }
   }

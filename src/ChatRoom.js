@@ -59,7 +59,6 @@ const ChatRoom = ({ logout, history }) => {
       apiKey = response.data.apiKey;
       sessionId = response.data.sessionId;
       token = response.data.token;
-      visitedRooms.push(response.data.sessionId);
     }
   };
 
@@ -73,18 +72,20 @@ const ChatRoom = ({ logout, history }) => {
     session = OT.initSession(apiKey, sessionId);
 
     // Subscribe to a newly created stream
-    session.on("streamCreated", function (event) {
-      subscriber = session.subscribe(
-        event.stream,
-        "subscriber",
-        {
-          insertMode: "append",
-          width: 500,
-          height: 300,
-        },
-        handleError
-      );
-    });
+    if (!visitedRooms.includes(sessionId)) {
+      session.on("streamCreated", function (event) {
+        subscriber = session.subscribe(
+          event.stream,
+          "subscriber",
+          {
+            insertMode: "append",
+            width: 500,
+            height: 300,
+          },
+          handleError
+        );
+      });
+    }
     // Create a publisher
     publisher = OT.initPublisher(
       "publisher",
@@ -105,6 +106,7 @@ const ChatRoom = ({ logout, history }) => {
         handleError(error);
       } else {
         session.publish(publisher, handleError);
+        visitedRooms.push(sessionId);
       }
     });
     session.on("connectionCreated", function connectionCreated(event) {
@@ -190,7 +192,7 @@ const ChatRoom = ({ logout, history }) => {
     }
     if (subscriber) {
       session.unsubscribe(subscriber);
-      subscriber.destroy();
+      //subscriber.destroy();
     }
     session.unpublish(publisher);
     session.disconnect();
