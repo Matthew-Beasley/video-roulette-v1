@@ -20,6 +20,7 @@ const ChatRoom = ({ logout, history }) => {
   const refMsgDiv = useRef(null);
   const refMsgBox = useRef(null);
   const refJoinBttn = useRef(null);
+  const ref2rdo = useRef(null);
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
@@ -42,10 +43,16 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   const getAuthKeys = async () => {
-    const response = await axios.post(`/api/opentok/chat/${5}`, {
-      visitedRooms,
-      user,
-    });
+    let chatCount;
+    if (ref2rdo.current.checked) {
+      chatCount = 2;
+    } else {
+      chatCount = 9;
+    }
+      const response = await axios.post(`/api/opentok/chat/${chatCount}`, {
+        visitedRooms,
+        user
+      });
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -221,6 +228,10 @@ const ChatRoom = ({ logout, history }) => {
       <button type="button" onClick={() => goHome()}>
         Logout
       </button>
+      <input type="radio" id="2" ref={ref2rdo} defaultChecked={true} name="crowd" value="2" />
+      <label htmlFor="2">One on One</label>
+      <input type="radio" id="crowd" name="crowd" value="crowd" />
+      <label htmlFor="more">A Crowd is Fun</label>
       <div id="rightBottomCorner">
         <div id="subscriber" />
         <div id="publisher" />
