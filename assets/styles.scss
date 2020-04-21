@@ -35,7 +35,7 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
     overflow: hidden;
     height: 100%;
   }
-  p {
+  h4 {
     font-size: 6.4px;
   }
 
@@ -81,7 +81,7 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
   .logo {
     font-size: 6rem;
   }
-  p {
+  h4 {
     font-size: 9.6px;
   }
   html,
@@ -95,6 +95,9 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
   .logo {
     font-size: 10rem;
   }
+  h4 {
+    font-size: 16px;
+  }
   html,
   body {
     overflow: hidden;
@@ -106,6 +109,9 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
   .logo {
     font-size: 10rem;
   }
+  h4 {
+    font-size: 16px;
+  }
   html,
   body {
     overflow: hidden;
@@ -116,6 +122,9 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
 @media #{$xxlarge-up} {
   .logo {
     font-size: 10rem;
+  }
+  h4 {
+    font-size: 16px;
   }
   html,
   body {
