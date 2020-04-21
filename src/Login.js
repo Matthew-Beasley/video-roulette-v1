@@ -18,31 +18,8 @@ const Login = () => {
   return (
     <div>
       <div className="text-center">
-        <h1>
-          <ul className="c-rainbow">
-            <li className="c-rainbow__layer c-rainbow__layer--white">
-              PARTY WITH FRIENDS YOU'VE NEVER MET
-            </li>
-            <li className="c-rainbow__layer c-rainbow__layer--orange">
-              PARTY WITH FRIENDS YOU'VE NEVER MET
-            </li>
-            <li className="c-rainbow__layer c-rainbow__layer--red">
-              PARTY WITH FRIENDS YOU'VE NEVER MET
-            </li>
-            <li className="c-rainbow__layer c-rainbow__layer--violet">
-              PARTY WITH FRIENDS YOU'VE NEVER MET
-            </li>
-            <li className="c-rainbow__layer c-rainbow__layer--blue">
-              PARTY WITH FRIENDS YOU'VE NEVER MET
-            </li>
-            <li className="c-rainbow__layer c-rainbow__layer--green">
-              PARTY WITH FRIENDS YOU'VE NEVER MET
-            </li>
-            <li className="c-rainbow__layer c-rainbow__layer--yellow">
-              PARTY WITH FRIENDS YOU'VE NEVER MET
-            </li>
-          </ul>
-        </h1>
+        <h1 className="logo">ChatParty</h1>
+        <p>A PARTY WITH FRIENDS YOU'VE NEVER MET</p>
       </div>
       <br />
       <form

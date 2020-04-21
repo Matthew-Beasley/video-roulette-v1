@@ -1,103 +1,134 @@
-$root: ".c-rainbow";
-
-:root {
-  --color-background: #31037d;
-
-  --axis-x: 1px;
-  --axis-y: 5px;
-  --delay: 7;
-
-  --color-black: #000;
-  --color-white: #fff;
-  --color-orange: #d49c3d;
-  --color-red: #d14b3d;
-  --color-violet: #cf52eb;
-  --color-blue: #44a3f7;
-  --color-green: #5acb3c;
-  --color-yellow: #debf40;
-
-  --color-foreground: var(--color-white);
-  --font-name: Righteous;
+@function lower-bound($range) {
+  @if length($range) <= 0 {
+    @return 0;
+  }
+  @return nth($range, 1);
 }
 
-html,
-body {
-  font-size: 24px;
+@function upper-bound($range) {
+  @if length($range) < 2 {
+    @return 999999999999;
+  }
+  @return nth($range, 2);
 }
 
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+$small-range: (0em, 40em);
+$medium-range: (40.063em, 64em);
+$large-range: (64.063em, 90em);
+$xlarge-range: (90.063em, 120em);
+$xxlarge-range: (120.063em, 99999999em);
 
-  height: 100vh;
+$screen: "only screen";
+$small-up: $screen;
+$medium-up: "#{$screen} and (min-width:#{lower-bound($medium-range)})";
+$large-up: "#{$screen} and (min-width:#{lower-bound($large-range)})";
+$xlarge-up: "#{$screen} and (min-width:#{lower-bound($xlarge-range)})";
+$xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
+
+@mixin single-transition($property: all, $speed: 300ms, $ease: ease-out) {
+  transition: $property $speed $ease;
 }
 
-#{$root} {
-  counter-reset: rainbow;
-  position: relative;
-  display: block;
+@media #{$small-up} {
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  }
+  p {
+    font-size: 6.4px;
+  }
 
-  list-style: none;
+  .logo {
+    font-size: 4rem;
+    text-align: center;
+    background: -webkit-linear-gradient(
+      left,
+      #000000,
+      #5bb3f4,
+      #ca10eb,
+      #f7a228,
+      #000000
+    );
+    background: linear-gradient(
+      left,
+      #000000,
+      #5bb3f4,
+      #ca10eb,
+      #f7a228,
+      #000000
+    );
+    background-size: 3200px 200px;
+    color: transparent;
 
-  padding: 0;
-  margin: 0;
+    -webkit-background-clip: text;
+    -webkit-animation: animate-logo;
+    -webkit-animation-delay: 0;
+    -webkit-animation-duration: 7s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-fill-mode: forwards;
 
-  &__layer {
-    --text-color: var(--color-foreground);
-    counter-increment: rainbow;
-    font-size: 3rem;
-    color: var(--text-color);
-
-    text-shadow: -1px -1px 0 var(--color-black), 1px -1px 0 var(--color-black),
-      -1px 1px 0 var(--color-black), 1px 1px 0 var(--color-black),
-      4px 4px 0 rgba(0, 0, 0, 0.2);
-
-    animation: rainbow 2.5s ease-in-out infinite;
-
-    @for $i from 1 through 7 {
-      &:nth-child(#{$i}) {
-        animation-delay: calc(#{$i} / var(--delay) * 1s);
-        left: calc(var(--axis-x) * #{$i});
-        z-index: -#{$i * 10};
-      }
-    }
-
-    &:not(:first-child) {
-      position: absolute;
-      top: 0;
-    }
-
-    &--white {
-      --text-color: var(--color-white);
-    }
-    &--orange {
-      --text-color: var(--color-orange);
-    }
-    &--red {
-      --text-color: var(--color-red);
-    }
-    &--violet {
-      --text-color: var(--color-violet);
-    }
-    &--blue {
-      --text-color: var(--color-blue);
-    }
-    &--green {
-      --text-color: var(--color-green);
-    }
-    &--yellow {
-      --text-color: var(--color-yellow);
-    }
+    @include single-transition(
+      $property: font-size,
+      $speed: 500ms,
+      $ease: ease-in-out
+    );
   }
 }
 
-@keyframes rainbow {
-  0%,
+@media #{$medium-up} {
+  .logo {
+    font-size: 6rem;
+  }
+  p {
+    font-size: 9.6px;
+  }
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  }
+}
+
+@media #{$large-up} {
+  .logo {
+    font-size: 10rem;
+  }
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  }
+}
+
+@media #{$xlarge-up} {
+  .logo {
+    font-size: 10rem;
+  }
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  }
+}
+
+@media #{$xxlarge-up} {
+  .logo {
+    font-size: 10rem;
+  }
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  }
+}
+
+@-webkit-keyframes animate-logo {
+  0% {
+    background-position: 0 3200px;
+  }
   100% {
-    transform: translatey(var(--axis-y));
-  }
-  50% {
-    transform: translatey(calc(var(--axis-y) * -1));
+    background-position: 3200px 0;
   }
 }
