@@ -9,10 +9,11 @@ const createUser = async ({
   email,
   password,
   googleId,
+  imageURL,
 }) => {
   const sql = `
-  INSERT INTO users ("userName", "firstName", "lastName", email, password, "googleId")
-  VALUES ($1, $2, $3, $4, $5, $6)
+  INSERT INTO users ("userName", "firstName", "lastName", email, password, "googleId", "imageURL")
+  VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;`;
   return (
     await client.query(sql, [
@@ -22,6 +23,7 @@ const createUser = async ({
       email,
       await hash(password),
       googleId,
+      imageURL,
     ])
   ).rows[0];
 };

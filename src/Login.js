@@ -19,7 +19,7 @@ const Login = () => {
     <div>
       <div className="text-center">
         <h1 className="logo">ChatParty</h1>
-        <p>A PARTY WITH FRIENDS YOU'VE NEVER MET</p>
+        <h4>A PARTY WITH FRIENDS YOU'VE NEVER MET</h4>
       </div>
       <br />
       <form

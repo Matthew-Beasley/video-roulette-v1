@@ -66,7 +66,7 @@ const App = () => {
     );
   } else {
     return (
-      <div className="container-lg h-100">
+      <div className="container h-100 mw-100">
         <Route
           path="/chat"
           render={() => <ChatRoom logout={logout} history={history} />}

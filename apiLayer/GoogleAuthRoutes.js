@@ -50,6 +50,7 @@ authRouter.get("/callback", async (req, res, next) => {
 
     //may have to change values.email to values.googleId in case someone signs up for simple with gmail
     const user = await getUser({ email: values.email });
+    console.log(values);
 
     if (user === undefined) {
       createUser({
@@ -59,6 +60,7 @@ authRouter.get("/callback", async (req, res, next) => {
         email: values.email,
         password: values.password,
         googleId: values.googleId,
+        imageURL: values.imageURL,
       });
       res.send(
         `<script>

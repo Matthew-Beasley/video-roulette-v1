@@ -1,10 +1,12 @@
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
+import { Session } from "@opentok/client";
 const OT = require("@opentok/client");
 
 const ChatRoom = ({ logout, history }) => {
+  const [user, setUser] = useState("");
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -13,7 +15,6 @@ const ChatRoom = ({ logout, history }) => {
   let session;
   let publisher;
   let subscriber;
-  let user;
   const connectedUsers = {};
   const visitedRooms = [];
   let message;
@@ -24,8 +25,8 @@ const ChatRoom = ({ logout, history }) => {
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
-    user = await axios.post("/api/users/getuser", { email });
-    user = user.data;
+    const response = await axios.post("/api/users/getuser", { email });
+    setUser(response.data);
   };
 
   useEffect(() => {
@@ -49,10 +50,10 @@ const ChatRoom = ({ logout, history }) => {
     } else {
       chatCount = 9;
     }
-      const response = await axios.post(`/api/opentok/chat/${chatCount}`, {
-        visitedRooms,
-        user
-      });
+    const response = await axios.post(`/api/opentok/chat/${chatCount}`, {
+      visitedRooms,
+      user,
+    });
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
@@ -80,13 +81,13 @@ const ChatRoom = ({ logout, history }) => {
         "subscriber",
         {
           insertMode: "append",
-          width: 300,
+          width: 500,
           height: 300,
         },
         handleError
       );
     });
-      // Create a publisher
+    // Create a publisher
     publisher = OT.initPublisher(
       "publisher",
       {
@@ -207,6 +208,7 @@ const ChatRoom = ({ logout, history }) => {
     refJoinBttn.current.disabled = true;
     await getAuthKeys();
     initializeSession();
+    console.log(user);
   };
 
   const goHome = async () => {
@@ -218,23 +220,116 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   return (
-    <div id="container">
-      <button type="button" ref={refJoinBttn} onClick={() => joinRandomSession()}>
-        Join Random Session
+    <div>
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <a className="navbar-brand" href="#/chat">
+          {user.imageURL ? (
+            <img
+              className="rounded-circle"
+              src={user.imageURL}
+              width="40"
+              height="40"
+              alt=""
+            />
+          ) : (
+            <img src="../assets/orgCicon.png" width="40" height="40" alt="" />
+          )}
+        </a>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon" />
+        </button>
+
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav mr-auto">
+            <li className="nav-item active">
+              <a className="nav-link" href="#/chat">
+                Chat <span className="sr-only">(current)</span>
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#/chat">
+                {/* Need to change the href here once we have voting up */}
+                Leaderboards
+              </a>
+            </li>
+            <li className="nav-item dropdown">
+              <a
+                className="nav-link dropdown-toggle"
+                href="#/chat"
+                id="navbarDropdownMenuLink"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Party Size
+              </a>
+              <div
+                className="dropdown-menu"
+                aria-labelledby="navbarDropdownMenuLink"
+              >
+                <a className="dropdown-item" href="#">
+                  One On One
+                </a>
+                <a className="dropdown-item" href="#">
+                  A Crowd Is Fun
+                </a>
+                <div className="dropdown-divider" />
+                <a className="dropdown-item" href="#">
+                  Something else
+                </a>
+              </div>
+            </li>
+          </ul>
+          <form className="form-inline my-2 my-lg-0">
+            Welcome&nbsp;
+            <a className="mr-3" href="#/chat">
+              {user.userName}
+            </a>
+            <button
+              className="btn-md btn-outline-dark my-2 my-sm-0"
+              type="button"
+              onClick={() => goHome()}
+            >
+              Logout
+            </button>
+          </form>
+        </div>
+      </nav>
+      <button
+        type="button"
+        ref={refJoinBttn}
+        onClick={() => joinRandomSession()}
+      >
+        Start A Party
       </button>
       <button type="button" onClick={() => sendStopSignal()}>
-        Leave Session
+        Leave The Party
       </button>
-      <button type="button" onClick={() => goHome()}>
-        Logout
-      </button>
-      <input type="radio" id="2" ref={ref2rdo} defaultChecked={true} name="crowd" value="2" />
+      <input
+        type="radio"
+        id="2"
+        ref={ref2rdo}
+        defaultChecked={true}
+        name="crowd"
+        value="2"
+      />
       <label htmlFor="2">One on One</label>
       <input type="radio" id="crowd" name="crowd" value="crowd" />
       <label htmlFor="more">A Crowd is Fun</label>
-      <div id="rightBottomCorner">
-        <div id="subscriber" />
-        <div id="publisher" />
+      <div id="videoContainer">
+        <div id="rightBottomCorner">
+          <div id="subscriber" />
+          <div id="publisher" />
+        </div>
       </div>
       <div id="textchat-display">
         <div id="message-box" ref={refMsgDiv} />

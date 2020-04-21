@@ -1,3 +1,59 @@
+body,
+html,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.margTop {
+  margin-top: 12rem;
+}
+
+body {
+  font-family: "Muli", sans-serif;
+}
+
+h1 {
+  font-size: 50px;
+}
+#videos {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#subscriber {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#publisher {
+  width: 100%;
+  height: 100%;
+  bottom: 10px;
+  left: 10px;
+  border: 3px solid white;
+  border-radius: 3px;
+}
+#message-box {
+  height: 15rem;
+  width: 300px;
+  overflow-y: scroll;
+  border: 1px solid black;
+  background-color: white;
+  color: black;
+}
+
+#msg-text {
+  height: 4rem;
+  width: 300px;
+}
+
 @function lower-bound($range) {
   @if length($range) <= 0 {
     @return 0;
@@ -35,7 +91,7 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
     overflow: hidden;
     height: 100%;
   }
-  p {
+  h4 {
     font-size: 6.4px;
   }
 
@@ -81,7 +137,7 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
   .logo {
     font-size: 6rem;
   }
-  p {
+  h4 {
     font-size: 9.6px;
   }
   html,
@@ -95,6 +151,9 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
   .logo {
     font-size: 10rem;
   }
+  h4 {
+    font-size: 16px;
+  }
   html,
   body {
     overflow: hidden;
@@ -106,6 +165,9 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
   .logo {
     font-size: 10rem;
   }
+  h4 {
+    font-size: 16px;
+  }
   html,
   body {
     overflow: hidden;
@@ -116,6 +178,9 @@ $xxlarge-up: "#{$screen} and (min-width:#{lower-bound($xxlarge-range)})";
 @media #{$xxlarge-up} {
   .logo {
     font-size: 10rem;
+  }
+  h4 {
+    font-size: 16px;
   }
   html,
   body {
