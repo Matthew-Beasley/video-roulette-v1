@@ -12,7 +12,7 @@ var opentok = new OpenTok(apiKey, secret);
 // This is not persisted. Redis?
 var roomToSessionIdDictionary = {};
 
-const findAvailableRoom = (participants, visitedRooms) => {
+const findAvailableRoom = (participants) => {
   const candidateRooms = Object.keys(roomToSessionIdDictionary);
   for (let i = 0; i < candidateRooms.length; i++) {
     if (roomToSessionIdDictionary[candidateRooms[i]].connectionCount < participants) {
@@ -51,7 +51,7 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
   const tokenOptions = {};
   const { memberscount } = req.params;
   const { visitedRooms, user } = req.body;
-  let roomName = findAvailableRoom(memberscount, visitedRooms);
+  let roomName = findAvailableRoom(memberscount);
 
   // we should now have an available room, if not drop down to create a room
   if (roomName) {

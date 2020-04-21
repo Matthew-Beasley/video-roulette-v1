@@ -208,7 +208,6 @@ const ChatRoom = ({ logout, history }) => {
     refJoinBttn.current.disabled = true;
     await getAuthKeys();
     initializeSession();
-    console.log(user);
   };
 
   const goHome = async () => {
