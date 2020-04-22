@@ -38,6 +38,7 @@ const Login = () => {
               &nbsp;&nbsp;&nbsp; Login with Google
             </a>
           </p>
+          <button onClick={getMyLocation}></button>
         </div>
       </form>
     </div>

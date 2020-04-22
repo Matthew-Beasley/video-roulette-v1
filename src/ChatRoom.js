@@ -6,7 +6,7 @@ import { Session } from "@opentok/client";
 const OT = require("@opentok/client");
 
 const ChatRoom = ({ logout, history }) => {
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState({});
   //this comes from the server
   let apiKey;
   let sessionId;
@@ -18,20 +18,23 @@ const ChatRoom = ({ logout, history }) => {
   const connectedUsers = {};
   const visitedRooms = [];
   let message;
+  let address;
+  let location;
   const refMsgDiv = useRef(null);
   const refMsgBox = useRef(null);
   const refJoinBttn = useRef(null);
   const refCountSlct = useRef(null);
 
+  const GEOCODING_API_KEY = "956b9b9ef1974a429c11328a9ef089d0";
+
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
     const response = await axios.post("/api/users/getuser", { email });
-    setUser(response.data);
+    console.log(location);
+    const temp = response.data;
+    temp.location = location;
+    setUser(temp);
   };
-
-  useEffect(() => {
-    getUser();
-  }, []);
 
   useEffect(() => {
     if (history.action === "POP") {
@@ -43,6 +46,41 @@ const ChatRoom = ({ logout, history }) => {
     logout();
   };
 
+  const callGetLocation = async () => {
+    await getMyLocation();
+    await getUser();
+  };
+
+  // console.log(GEOCODING_API_KEY);
+  const getMyLocation = async () => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation)
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          address = (
+            await axios.get(
+              `https://api.opencagedata.com/geocode/v1/json?key=${GEOCODING_API_KEY}&q=${position.coords.latitude},${position.coords.longitude}&pretty=1&no_annotations=1`
+            )
+          ).data;
+          // console.log(user);
+          location = {
+            City: address.results[0].components.city,
+            State: address.results[0].components.state_code,
+            Country: address.results[0].components["ISO_3166-1_alpha-3"],
+          };
+          console.log(location);
+          resolve(location);
+        });
+      else {
+        console.log("The Locator was denied. :(");
+        reject("The locator was denied.");
+      }
+    });
+  };
+
+  useEffect(() => {
+    callGetLocation();
+    // getMyLocation().then((val) => getUser());
+  }, []);
   const getAuthKeys = async () => {
     console.log(refCountSlct.current.value);
     const response = await axios.post(
@@ -260,7 +298,7 @@ const ChatRoom = ({ logout, history }) => {
               </a>
             </li>
             <li className="nav-item dropdown">
-             {/* <a
+              {/* <a
                 className="nav-link dropdown-toggle"
                 href="#/chat"
                 id="navbarDropdownMenuLink"
@@ -285,16 +323,16 @@ const ChatRoom = ({ logout, history }) => {
                   <a className="dropdown-item" href="#">
                     Something else
                 </a> */}
-                <select id="participants" ref={refCountSlct} >
-                  <optgroup label="Participants">
-                    <option value="2">One on One</option>
-                    <option value="9">A Crowd is Fun</option>
-                  </optgroup>
-                  <optgroup label="something else">
-                    <option value="something">Something else</option>
-                  </optgroup>
-                </select>
-             { /*</li></div>*/}
+              <select id="participants" ref={refCountSlct}>
+                <optgroup label="Participants">
+                  <option value="2">One on One</option>
+                  <option value="9">A Crowd is Fun</option>
+                </optgroup>
+                <optgroup label="something else">
+                  <option value="something">Something else</option>
+                </optgroup>
+              </select>
+              {/*</li></div>*/}
             </li>
           </ul>
           <form className="form-inline my-2 my-lg-0">
@@ -302,6 +340,7 @@ const ChatRoom = ({ logout, history }) => {
             <a className="mr-3" href="#/chat">
               {user.userName}
             </a>
+            {console.log(user)}
             <button
               className="btn-md btn-outline-dark my-2 my-sm-0"
               type="button"
