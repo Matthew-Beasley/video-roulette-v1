@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
 import React, { useRef, useEffect, useState } from "react";
@@ -52,9 +53,9 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   // console.log(GEOCODING_API_KEY);
-  const getMyLocation = async () => {
+  const getMyLocation = () => {
     return new Promise((resolve, reject) => {
-      if (navigator.geolocation)
+      if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
           address = (
             await axios.get(
@@ -70,9 +71,9 @@ const ChatRoom = ({ logout, history }) => {
           console.log(location);
           resolve(location);
         });
-      else {
+      } else {
         console.log("The Locator was denied. :(");
-        reject("The locator was denied.");
+        reject(Error("The locator was denied."));
       }
     });
   };
