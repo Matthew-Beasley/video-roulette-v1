@@ -49,12 +49,12 @@ authRouter.get("/callback", async (req, res, next) => {
     }
 
     //may have to change values.email to values.googleId in case someone signs up for simple with gmail
-    const user = await getUser({ email: values.email });
+    let user = await getUser({ email: values.email });
     console.log(values);
 
-    if (user === undefined) {
-      createUser({
-        userName: uuid.v4(),
+    if (!user) {
+      user = await createUser({
+        userName: "",
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
@@ -62,6 +62,9 @@ authRouter.get("/callback", async (req, res, next) => {
         googleId: values.googleId,
         imageURL: values.imageURL,
       });
+    }
+
+    if (!user.userName) {
       res.send(
         `<script>
         window.localStorage.setItem('token', '${data.id_token}');

@@ -5,11 +5,20 @@ const CreateUserName = ({ history, logout }) => {
   const [userName, setUserName] = useState("");
   const [error, setError] = useState("");
 
-  const onSubmit = (ev) => {
+  const onSubmit = async(ev) => {
     ev.preventDefault();
     const email = window.localStorage.getItem("email");
+    
+    const testUser = await Axios.post("/api/users/getuser", { userName: userName });
+    console.log("userName  is ", userName)
+    console.log("test user is ", testUser)
+    if (testUser.data) {
+      console.log(testUser)
+      alert("You need a unique user name, please try again");
+      return;
+    }
     try {
-      Axios.put("/api/users", {
+      await Axios.put("/api/users", {
         userName,
         email,
       });
@@ -41,7 +50,7 @@ const CreateUserName = ({ history, logout }) => {
             value={userName}
             onChange={(ev) => setUserName(ev.target.value)}
           />
-          <button className="btn-sm btn-outline-dark">
+          <button className="btn-sm btn-outline-dark" disabled={userName.length < 1}>
             &nbsp;&nbsp;Create Username&nbsp;&nbsp;
           </button>
         </form>
