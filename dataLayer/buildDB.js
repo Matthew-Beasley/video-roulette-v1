@@ -8,7 +8,7 @@ const buildDB = async () => {
   
   CREATE TABLE users(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "userName" VARCHAR(100) NOT NULL UNIQUE CHECK(char_length("userName") > 0),
+    "userName" VARCHAR(100),
     "firstName" VARCHAR(100) NOT NULL CHECK(char_length("firstName") > 0),
     "lastName" VARCHAR(100) NOT NULL CHECK(char_length("lastName") > 0),
     email VARCHAR(100) NOT NULL CHECK(char_length(email) > 0),
