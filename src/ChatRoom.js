@@ -53,6 +53,7 @@ const ChatRoom = ({ logout, history }) => {
     console.log(user)
   };
 
+
   const getMyLocation = () => {
     return new Promise((resolve, reject) => {
       if (navigator.geolocation) {
@@ -81,6 +82,7 @@ const ChatRoom = ({ logout, history }) => {
   useEffect(() => {
     callGetLocation();
   }, []);
+  
   const getAuthKeys = async () => {
     console.log(refCountSlct.current.value);
     const response = await axios.post(
