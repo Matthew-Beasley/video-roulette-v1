@@ -73,7 +73,7 @@ const App = () => {
         />
         <Route
           path="/createusername"
-          render={() => <CreateUsername history={history} />}
+          render={() => <CreateUsername logout={logout} history={history} />}
         />
         <Route path="/login" render={() => <Login login={login} />} />
       </div>

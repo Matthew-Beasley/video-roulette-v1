@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Axios from "axios";
 
-const CreateUserName = ({ history }) => {
+const CreateUserName = ({ history, logout }) => {
   const [userName, setUserName] = useState("");
   const [error, setError] = useState("");
 
@@ -18,6 +18,10 @@ const CreateUserName = ({ history }) => {
       setError(ex.response.data.message);
       console.log(error);
     }
+  };
+
+  window.onunload = function () {
+    logout();
   };
 
   return (

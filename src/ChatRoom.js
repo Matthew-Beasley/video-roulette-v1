@@ -50,6 +50,7 @@ const ChatRoom = ({ logout, history }) => {
   const callGetLocation = async () => {
     await getMyLocation();
     await getUser();
+    console.log(user)
   };
 
   // console.log(GEOCODING_API_KEY);
