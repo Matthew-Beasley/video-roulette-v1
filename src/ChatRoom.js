@@ -26,7 +26,7 @@ const ChatRoom = ({ logout, history }) => {
   const refJoinBttn = useRef(null);
   const refCountSlct = useRef(null);
 
-  const GEOCODING_API_KEY = "956b9b9ef1974a429c11328a9ef089d0";
+  const GEOCODING_API_KEY = "lhdNJtemDRfjctoDTw5DqAYs2qr9uloY";
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
@@ -48,28 +48,28 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   const callGetLocation = async () => {
-    // await getMyLocation();
+    await getMyLocation();
     await getUser();
     console.log(user)
   };
 
-  // console.log(GEOCODING_API_KEY);
+
   const getMyLocation = () => {
     return new Promise((resolve, reject) => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
           address = (
             await axios.get(
-              `https://api.opencagedata.com/geocode/v1/json?key=${GEOCODING_API_KEY}&q=${position.coords.latitude},${position.coords.longitude}&pretty=1&no_annotations=1`
+              `https://api.tomtom.com/search/2/reverseGeocode/${position.coords.latitude},${position.coords.longitude}.JSON?key=${GEOCODING_API_KEY}`
             )
           ).data;
-          // console.log(user);
+           console.log("address is ", address);
           location = {
-            City: address.results[0].components.city,
-            State: address.results[0].components.state_code,
-            Country: address.results[0].components["ISO_3166-1_alpha-3"],
+            City: address.addresses[0].address.municipality,
+            State: address.addresses[0].address.countrySubdivision,
+            Country: address.addresses[0].address.countryCodeISO3
           };
-          console.log(location);
+          console.log("location is ", location);
           resolve(location);
         });
       } else {
@@ -81,8 +81,8 @@ const ChatRoom = ({ logout, history }) => {
 
   useEffect(() => {
     callGetLocation();
-    // getMyLocation().then((val) => getUser());
   }, []);
+  
   const getAuthKeys = async () => {
     console.log(refCountSlct.current.value);
     const response = await axios.post(
