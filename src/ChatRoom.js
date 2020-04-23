@@ -48,7 +48,7 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   const callGetLocation = async () => {
-    await getMyLocation();
+    // await getMyLocation();
     await getUser();
     console.log(user)
   };
@@ -119,8 +119,8 @@ const ChatRoom = ({ logout, history }) => {
           "subscriber",
           {
             insertMode: "append",
-            width: 500,
-            height: 300,
+            width: "100%",
+            height: "500px",
           },
           handleError
         );
@@ -133,8 +133,8 @@ const ChatRoom = ({ logout, history }) => {
         name: user.userName,
         style: { nameDisplayMode: "on" },
         insertMode: "append",
-        width: "100%",
-        height: "100%",
+        width: "180px",
+        height: "120px",
       },
       handleError
     );
@@ -259,7 +259,7 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   return (
-    <div>
+    <div className="h-100">
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <a className="navbar-brand" href="#/chat">
           {user.imageURL ? (
@@ -325,15 +325,6 @@ const ChatRoom = ({ logout, history }) => {
                   <a className="dropdown-item" href="#">
                     Something else
                 </a> */}
-              <select id="participants" ref={refCountSlct}>
-                <optgroup label="Participants">
-                  <option value="2">One on One</option>
-                  <option value="9">A Crowd is Fun</option>
-                </optgroup>
-                <optgroup label="something else">
-                  <option value="something">Something else</option>
-                </optgroup>
-              </select>
               {/*</li></div>*/}
             </li>
           </ul>
@@ -342,7 +333,6 @@ const ChatRoom = ({ logout, history }) => {
             <a className="mr-3" href="#/chat">
               {user.userName}
             </a>
-            {console.log(user)}
             <button
               className="btn-md btn-outline-dark my-2 my-sm-0"
               type="button"
@@ -353,36 +343,58 @@ const ChatRoom = ({ logout, history }) => {
           </form>
         </div>
       </nav>
-      <button
-        type="button"
-        ref={refJoinBttn}
-        onClick={() => joinRandomSession()}
-      >
-        Start A Party
-      </button>
-      <button type="button" onClick={() => sendStopSignal()}>
-        Leave The Party
-      </button>
-      <div id="videoContainer">
-        <div id="rightBottomCorner">
-          <div id="subscriber" />
-          <div id="publisher" />
-        </div>
+      <div>
+        Party Size &nbsp;&nbsp;
+        <select id="participants" ref={refCountSlct}>
+          <optgroup label="Participants">
+            <option value="2">One on One</option>
+            <option value="9">A Crowd is Fun</option>
+          </optgroup>
+          <optgroup label="something else">
+            <option value="something">Something else</option>
+          </optgroup>
+        </select>
+        <button
+          type="button"
+          ref={refJoinBttn}
+          onClick={() => joinRandomSession()}
+        >
+          Start A Party
+        </button>
+        <button type="button" onClick={() => sendStopSignal()}>
+          Leave The Party
+        </button>
       </div>
-      <div id="textchat-display">
-        <div id="message-box" ref={refMsgDiv} />
-        <form onSubmit={(ev) => sendMessage(ev)}>
-          <input
-            type="text"
-            placeholder="Input your text here"
-            id="msg-text"
-            ref={refMsgBox}
-            value={message}
-            onChange={(ev) => {
-              message = ev.target.value;
-            }} //create form component so video isn't interupted by rerender
-          />
-        </form>
+      <div className="container h-auto">
+        <div className="row h-100">
+          <div className="col-sm-12 h-100">
+            <div className="d-flex flex-row">
+              <div id="players" className="h-100 w-100">
+                <div id="videoContainer" className="h-100">
+                  <div id="subscriber" className="h-100 w-100" />
+                  <div id="bottomCorner">
+                    <div id="publisher" />
+                  </div>
+                </div>
+              </div>
+              <div id="textchat-display">
+                <div id="message-box" ref={refMsgDiv} />
+                <form onSubmit={(ev) => sendMessage(ev)}>
+                  <input
+                    type="text"
+                    placeholder="Input your text here"
+                    id="msg-text"
+                    ref={refMsgBox}
+                    value={message}
+                    onChange={(ev) => {
+                      message = ev.target.value;
+                    }} //create form component so video isn't interupted by rerender
+                  />
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
