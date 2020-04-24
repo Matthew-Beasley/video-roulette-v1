@@ -25,13 +25,13 @@ const ChatRoom = ({ logout, history }) => {
   const refMsgBox = useRef(null);
   const refJoinBttn = useRef(null);
   const refCountSlct = useRef(null);
+  const refSubscriber = useRef(null);
 
   const GEOCODING_API_KEY = "lhdNJtemDRfjctoDTw5DqAYs2qr9uloY";
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
     const response = await axios.post("/api/users/getuser", { email });
-    console.log(location);
     const temp = response.data;
     temp.location = location;
     setUser(temp);
@@ -50,7 +50,6 @@ const ChatRoom = ({ logout, history }) => {
   const callGetLocation = async () => {
     await getMyLocation();
     await getUser();
-    console.log(user)
   };
 
 
@@ -63,13 +62,11 @@ const ChatRoom = ({ logout, history }) => {
               `https://api.tomtom.com/search/2/reverseGeocode/${position.coords.latitude},${position.coords.longitude}.JSON?key=${GEOCODING_API_KEY}`
             )
           ).data;
-           console.log("address is ", address);
           location = {
             City: address.addresses[0].address.municipality,
             State: address.addresses[0].address.countrySubdivision,
             Country: address.addresses[0].address.countryCodeISO3
           };
-          console.log("location is ", location);
           resolve(location);
         });
       } else {
@@ -84,7 +81,6 @@ const ChatRoom = ({ logout, history }) => {
   }, []);
   
   const getAuthKeys = async () => {
-    console.log(refCountSlct.current.value);
     const response = await axios.post(
       `/api/opentok/chat/${refCountSlct.current.value}`,
       {
@@ -114,6 +110,7 @@ const ChatRoom = ({ logout, history }) => {
     // Subscribe to a newly created stream
     if (!visitedRooms.includes(sessionId)) {
       session.on("streamCreated", function (event) {
+        console.log("the event in subscriber is ", event);
         subscriber = session.subscribe(
           event.stream,
           "subscriber",
@@ -152,12 +149,10 @@ const ChatRoom = ({ logout, history }) => {
     session.on("connectionCreated", function connectionCreated(event) {
       const userData = JSON.parse(event.connection.data);
       connectedUsers[userData.userName] = userData;
-      //console.log("connectedUsers after create ", connectedUsers)
     });
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
       delete connectedUsers[userData.userName];
-      //console.log("connectedUsers after delete ", connectedUsers)
     });
     // Receive a signal from peer
     session.on("signal:disconnect", function signalCallback(event) {
@@ -176,7 +171,6 @@ const ChatRoom = ({ logout, history }) => {
       ${event.data}
       `;
       msg.scrollTop = msg.scrollHeight;
-      console.log(msg);
     });
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
@@ -257,6 +251,14 @@ const ChatRoom = ({ logout, history }) => {
     logout();
     history.push("/login");
   };
+
+  const upvote = () => {
+    console.log("refSubscriber is ", refSubscriber)
+  }
+
+  const downvote = () => {
+    
+  }
 
   return (
     <div className="h-100">
@@ -371,8 +373,9 @@ const ChatRoom = ({ logout, history }) => {
             <div className="d-flex flex-row">
               <div id="players" className="h-100 w-100">
                 <div id="videoContainer" className="h-100">
-                  <div id="subscriber" className="h-100 w-100" />
+                  <div id="subscriber" ref={refSubscriber} className="h-100 w-100" />
                   <div id="bottomCorner">
+                    <button onClick={() => upvote()}>up</button>
                     <div id="publisher" />
                   </div>
                 </div>
