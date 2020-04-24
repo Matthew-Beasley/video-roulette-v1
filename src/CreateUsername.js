@@ -10,10 +10,7 @@ const CreateUserName = ({ history, logout }) => {
     const email = window.localStorage.getItem("email");
     
     const testUser = await Axios.post("/api/users/getuser", { userName: userName });
-    console.log("userName  is ", userName)
-    console.log("test user is ", testUser)
     if (testUser.data) {
-      console.log(testUser)
       alert("You need a unique user name, please try again");
       return;
     }
