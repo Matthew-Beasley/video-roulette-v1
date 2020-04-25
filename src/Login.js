@@ -1,10 +1,6 @@
 import React from "react";
 
 const Login = () => {
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
   return (
     <div>
       <div className="text-center">
