@@ -5,18 +5,23 @@ import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
 import { Session } from "@opentok/client";
 const OT = require("@opentok/client");
+import Vote from "./Vote";
 
 const ChatRoom = ({ logout, history }) => {
   const [user, setUser] = useState({});
   //this comes from the server
-  let apiKey;
-  let sessionId;
-  let token;
+  const [apiKey, setApiKey] = useState(0);
+  const [sessionId, setSessionId] = useState("");
+  //let token;
+  const [token, setToken] = useState("");
   let roomname = 0;
-  let session;
+  //let session;
+  const [session, setSession] = useState({});
+  //const [publisher, setPublisher] = useState();
   let publisher;
+  let tempPublisher;
   let subscriber;
-  const connectedUsers = {};
+  const [connectedUsers, setConnectedUsers] = useState({});
   const visitedRooms = [];
   let message;
   let address;
@@ -92,9 +97,9 @@ const ChatRoom = ({ logout, history }) => {
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
     } else {
-      apiKey = response.data.apiKey;
-      sessionId = response.data.sessionId;
-      token = response.data.token;
+      setApiKey(response.data.apiKey);
+      setSessionId(response.data.sessionId);
+      setToken(response.data.token)
     }
   };
 
@@ -104,25 +109,38 @@ const ChatRoom = ({ logout, history }) => {
     }
   }
 
-  const initializeSession = () => {
-    session = OT.initSession(apiKey, sessionId);
-
-    // Subscribe to a newly created stream
-    if (!visitedRooms.includes(sessionId)) {
-      session.on("streamCreated", function (event) {
-        console.log("the event in subscriber is ", event);
-        subscriber = session.subscribe(
-          event.stream,
-          "subscriber",
-          {
-            insertMode: "append",
-            width: "100%",
-            height: "500px",
-          },
-          handleError
-        );
-      });
+  useEffect(() => {
+    if (Object.keys(session).length) {
+      console.log("session in hook", session)
+      onSessionTasks();
     }
+  }, [session]);
+
+  useEffect(() => {
+    if (sessionId.length > 0 && apiKey !== 0) {
+      const tempsession = OT.initSession(apiKey, sessionId);
+      console.log("tempsession is ", tempsession)
+      setSession(tempsession);
+    }
+  }, [apiKey, sessionId]);
+
+    const onSessionTasks = () => {
+      if (!visitedRooms.includes(sessionId)) {
+        session.on("streamCreated", function (event) {
+          console.log("the event in subscriber is ", event);
+          subscriber = session.subscribe(
+            event.stream,
+            "subscriber",
+            {
+              insertMode: "append",
+              width: "100%",
+              height: "500px",
+            },
+            handleError
+          );
+        });
+      }
+
     // Create a publisher
     publisher = OT.initPublisher(
       "publisher",
@@ -146,13 +164,17 @@ const ChatRoom = ({ logout, history }) => {
         visitedRooms.push(sessionId);
       }
     });
+    
     session.on("connectionCreated", function connectionCreated(event) {
       const userData = JSON.parse(event.connection.data);
+      userData.connectionId = event.connection.connectionId;
       connectedUsers[userData.userName] = userData;
+      setConnectedUsers({ ...connectedUsers });
     });
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
       delete connectedUsers[userData.userName];
+      console.log("connectedUsers is after destroy ", connectedUsers)
     });
     // Receive a signal from peer
     session.on("signal:disconnect", function signalCallback(event) {
@@ -241,7 +263,8 @@ const ChatRoom = ({ logout, history }) => {
   const joinRandomSession = async () => {
     refJoinBttn.current.disabled = true;
     await getAuthKeys();
-    initializeSession();
+    console.log("apikey in joinRandom", apiKey)
+    console.log("sessionId in joinRandom", sessionId)
   };
 
   const goHome = async () => {
@@ -375,7 +398,6 @@ const ChatRoom = ({ logout, history }) => {
                 <div id="videoContainer" className="h-100">
                   <div id="subscriber" ref={refSubscriber} className="h-100 w-100" />
                   <div id="bottomCorner">
-                    <button onClick={() => upvote()}>up</button>
                     <div id="publisher" />
                   </div>
                 </div>
@@ -395,6 +417,7 @@ const ChatRoom = ({ logout, history }) => {
                   />
                 </form>
               </div>
+              <Vote connectedUsers={connectedUsers} />
             </div>
           </div>
         </div>
