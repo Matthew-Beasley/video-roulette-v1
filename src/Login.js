@@ -1,19 +1,6 @@
 import React /* useState */ from "react";
 
 const Login = () => {
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
-  // const [error, setError] = useState("");
-  // const onSubmit = (ev) => {
-  //   ev.preventDefault();
-  //   console.log(email, password);
-  //   try {
-  //     axios.get("/api/auth");
-  //   } catch (ex) {
-  //     setError(ex.response.data.message);
-  //     console.log(error);
-  //   }
-  // };
 
   return (
     <div>

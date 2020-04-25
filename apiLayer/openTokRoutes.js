@@ -60,7 +60,6 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
     // generate token
     tokenOptions.role = "publisher";
     tokenOptions.data = `{"userName":"${user.userName}", "email":"${user.email}"}`;
-    console.log(tokenOptions)
     token = opentok.generateToken(sessionId, tokenOptions);
     res.setHeader("Content-Type", "application/json");
     res.send({
@@ -84,7 +83,6 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
       };
 
       // generate token
-      console.log("user is ", user)
       tokenOptions.role = "publisher";
       tokenOptions.data = `{"userName":"${user.userName}", "email":"${user.email}"}`;
       token = opentok.generateToken(session.sessionId, tokenOptions);
