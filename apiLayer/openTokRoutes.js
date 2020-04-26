@@ -50,7 +50,7 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
   let token;
   const tokenOptions = {};
   const { memberscount } = req.params;
-  const { visitedRooms, user } = req.body;
+  const { user } = req.body;
   let roomName = findAvailableRoom(memberscount);
 
   // we should now have an available room, if not drop down to create a room
@@ -66,7 +66,7 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
       apiKey: apiKey,
       sessionId: sessionId,
       token: token,
-      dictionary: roomToSessionIdDictionary,
+      roomName: roomName,
     });
     // this is the first time the room is being accessed, create a new session ID
   } else if (!roomName) {
@@ -91,7 +91,7 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
         apiKey: apiKey,
         sessionId: session.sessionId,
         token: token,
-        dictionary: roomToSessionIdDictionary,
+        roomName: roomName,
       });
     });
   }

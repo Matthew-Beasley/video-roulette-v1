@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useReducer } from "react";
 import axios from "axios";
 import { Session } from "@opentok/client";
 const OT = require("@opentok/client");
@@ -12,15 +12,11 @@ const ChatRoom = ({ logout, history }) => {
   //this comes from the server
   const [apiKey, setApiKey] = useState(0);
   const [sessionId, setSessionId] = useState("");
-  //let token;
   const [token, setToken] = useState("");
-  let roomname = 0;
-  //let session;
+  const [roomname, setRoomname] = useState(0);
   const [session, setSession] = useState({});
-  //const [publisher, setPublisher] = useState();
-  let publisher;
-  let tempPublisher;
-  let subscriber;
+  const [publisher, setPublisher] = useState();
+  const [subscriber, setSubscriber] = useState();
   const [connectedUsers, setConnectedUsers] = useState({});
   const visitedRooms = [];
   let message;
@@ -33,6 +29,8 @@ const ChatRoom = ({ logout, history }) => {
   const refSubscriber = useRef(null);
 
   const GEOCODING_API_KEY = "lhdNJtemDRfjctoDTw5DqAYs2qr9uloY";
+
+  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
@@ -56,7 +54,6 @@ const ChatRoom = ({ logout, history }) => {
     await getMyLocation();
     await getUser();
   };
-
 
   const getMyLocation = () => {
     return new Promise((resolve, reject) => {
@@ -87,11 +84,7 @@ const ChatRoom = ({ logout, history }) => {
   
   const getAuthKeys = async () => {
     const response = await axios.post(
-      `/api/opentok/chat/${refCountSlct.current.value}`,
-      {
-        visitedRooms,
-        user,
-      }
+      `/api/opentok/chat/${refCountSlct.current.value}`, { user }
     );
 
     if (!response) {
@@ -99,7 +92,8 @@ const ChatRoom = ({ logout, history }) => {
     } else {
       setApiKey(response.data.apiKey);
       setSessionId(response.data.sessionId);
-      setToken(response.data.token)
+      setToken(response.data.token);
+      setRoomname(response.data.roomName)
     }
   };
 
@@ -109,40 +103,34 @@ const ChatRoom = ({ logout, history }) => {
     }
   }
 
-  useEffect(() => {
-    if (Object.keys(session).length) {
-      console.log("session in hook", session)
-      onSessionTasks();
-    }
-  }, [session]);
 
   useEffect(() => {
     if (sessionId.length > 0 && apiKey !== 0) {
       const tempsession = OT.initSession(apiKey, sessionId);
-      console.log("tempsession is ", tempsession)
       setSession(tempsession);
     }
   }, [apiKey, sessionId]);
 
-    const onSessionTasks = () => {
-      if (!visitedRooms.includes(sessionId)) {
-        session.on("streamCreated", function (event) {
-          console.log("the event in subscriber is ", event);
-          subscriber = session.subscribe(
-            event.stream,
-            "subscriber",
-            {
-              insertMode: "append",
-              width: "100%",
-              height: "500px",
-            },
-            handleError
-          );
-        });
-      }
+  useEffect(() => {
+    //onSessionTasks();
+    if (session && publisher) {
+      session.connect(token, function (error) {
+        // If the connection is successful, publish to the session
+        if (error) {
+          handleError(error);
+        } else {
+          session.publish(publisher, handleError);
+          visitedRooms.push(sessionId);
+        }
+      });
+      createSubscriber();
+      onSessionTasks();
+    }
+    console.log("called session.connect in publisher useeffect")
+  }, [session, publisher]);
 
-    // Create a publisher
-    publisher = OT.initPublisher(
+  const createPublisher = () => {
+    const tempPublisher = OT.initPublisher(
       "publisher",
       {
         name: user.userName,
@@ -153,18 +141,28 @@ const ChatRoom = ({ logout, history }) => {
       },
       handleError
     );
+    setPublisher(tempPublisher);
+  }
 
-    // Connect to the session
-    session.connect(token, function (error) {
-      // If the connection is successful, publish to the session
-      if (error) {
-        handleError(error);
-      } else {
-        session.publish(publisher, handleError);
-        visitedRooms.push(sessionId);
-      }
-    });
-    
+  const createSubscriber = () => {
+    if (!visitedRooms.includes(sessionId)) {
+      session.on("streamCreated", function (event) {
+        const tempSubscriber = session.subscribe(
+          event.stream,
+          "subscriber",
+          {
+            insertMode: "append",
+            width: "100%",
+            height: "500px",
+          },
+          handleError
+        );
+        setSubscriber(tempSubscriber)
+      }); 
+    }
+  }
+
+  const onSessionTasks = () => {
     session.on("connectionCreated", function connectionCreated(event) {
       const userData = JSON.parse(event.connection.data);
       userData.connectionId = event.connection.connectionId;
@@ -174,7 +172,8 @@ const ChatRoom = ({ logout, history }) => {
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
       delete connectedUsers[userData.userName];
-      console.log("connectedUsers is after destroy ", connectedUsers)
+      console.log("connectedUsers in event handler ", connectedUsers);
+      setConnectedUsers({ ...connectedUsers });
     });
     // Receive a signal from peer
     session.on("signal:disconnect", function signalCallback(event) {
@@ -197,7 +196,7 @@ const ChatRoom = ({ logout, history }) => {
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
     });
-  };
+  }
 
   // Text chat
   // Send a signal once the user enters data in the form
@@ -242,17 +241,20 @@ const ChatRoom = ({ logout, history }) => {
     refJoinBttn.current.disabled = false;
     await sendDisconnectSignal();
     try {
+      console.log("roomname in leavesession ", roomname)
       await axios.post(`/api/opentok/decrimentsession/${roomname}`);
     } catch (err) {
-      console.log(err);
+      Error(err);
     }
     if (subscriber) {
       session.unsubscribe(subscriber);
       //subscriber.destroy();
     }
-    session.unpublish(publisher);
     session.disconnect();
+    session.unpublish(publisher);
     publisher.destroy();
+    forceUpdate();
+    //setPublisher({});// ?
   };
 
   const sendStopSignal = async () => {
@@ -263,8 +265,7 @@ const ChatRoom = ({ logout, history }) => {
   const joinRandomSession = async () => {
     refJoinBttn.current.disabled = true;
     await getAuthKeys();
-    console.log("apikey in joinRandom", apiKey)
-    console.log("sessionId in joinRandom", sessionId)
+    createPublisher();
   };
 
   const goHome = async () => {
@@ -274,14 +275,6 @@ const ChatRoom = ({ logout, history }) => {
     logout();
     history.push("/login");
   };
-
-  const upvote = () => {
-    console.log("refSubscriber is ", refSubscriber)
-  }
-
-  const downvote = () => {
-    
-  }
 
   return (
     <div className="h-100">
