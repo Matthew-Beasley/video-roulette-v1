@@ -26,7 +26,7 @@ const Vote = ({ connectedUsers }) => {
       <button onClick={() => upvote()}>test</button>
       <ul ref={refVoteList}>
         {Object.entries(connectedUsers).forEach(connectedUser => {
-          console.log("connectedUser in the ul ", connectedUser)
+         // console.log("connectedUser in the ul ", connectedUser)
           return (
             {/*}   <li key={1}>
               {connectedUsers.userData.userName ? connectedUsers.userData.userName : ""}

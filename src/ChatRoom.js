@@ -95,6 +95,7 @@ const ChatRoom = ({ logout, history }) => {
       setToken(response.data.token);
       setRoomname(response.data.roomName)
     }
+    console.log("sessionId in getAuthKeys ". sessionId)
   };
 
   function handleError(error) {
@@ -112,8 +113,8 @@ const ChatRoom = ({ logout, history }) => {
   }, [apiKey, sessionId]);
 
   useEffect(() => {
-    //onSessionTasks();
     if (session && publisher) {
+      console.log("sessionin before session.connect is ", session)
       session.connect(token, function (error) {
         // If the connection is successful, publish to the session
         if (error) {
@@ -126,22 +127,23 @@ const ChatRoom = ({ logout, history }) => {
       createSubscriber();
       onSessionTasks();
     }
-    console.log("called session.connect in publisher useeffect")
   }, [session, publisher]);
 
   const createPublisher = () => {
-    const tempPublisher = OT.initPublisher(
-      "publisher",
-      {
-        name: user.userName,
-        style: { nameDisplayMode: "on" },
-        insertMode: "append",
-        width: "180px",
-        height: "120px",
-      },
-      handleError
-    );
-    setPublisher(tempPublisher);
+    if (!publisher) {
+      const tempPublisher = OT.initPublisher(
+        "publisher",
+        {
+          name: user.userName,
+          style: { nameDisplayMode: "on" },
+          insertMode: "append",
+          width: "180px",
+          height: "120px",
+        },
+        handleError
+      );
+      setPublisher(tempPublisher);
+    }
   }
 
   const createSubscriber = () => {
@@ -178,7 +180,7 @@ const ChatRoom = ({ logout, history }) => {
     // Receive a signal from peer
     session.on("signal:disconnect", function signalCallback(event) {
       if (event.data === "disconnect") {
-        alert(`${user.userName} has disconnected (on purpose I hope!)`);
+        //alert(`${user.userName} has disconnected (on purpose I hope!)`);
       } else {
         alert(event.data);
       }
@@ -241,7 +243,6 @@ const ChatRoom = ({ logout, history }) => {
     refJoinBttn.current.disabled = false;
     await sendDisconnectSignal();
     try {
-      console.log("roomname in leavesession ", roomname)
       await axios.post(`/api/opentok/decrimentsession/${roomname}`);
     } catch (err) {
       Error(err);
@@ -249,12 +250,12 @@ const ChatRoom = ({ logout, history }) => {
     if (subscriber) {
       session.unsubscribe(subscriber);
       //subscriber.destroy();
+      //forceUpdate();
     }
     session.disconnect();
     session.unpublish(publisher);
-    publisher.destroy();
+    //publisher.destroy();
     forceUpdate();
-    //setPublisher({});// ?
   };
 
   const sendStopSignal = async () => {
