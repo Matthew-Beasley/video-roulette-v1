@@ -34,4 +34,4 @@ voteRouter.get("/votee/:votee", async (req, res, next) => {
   }
 });
 
-module.exports = { voteRouter };
+module.exports = voteRouter;

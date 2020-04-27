@@ -73,4 +73,4 @@ simpleAuthRouter.put("/users/:id", async (req, res, next) => {
   }
 });
 
-module.exports = { simpleAuthRouter };
+module.exports = simpleAuthRouter;
