@@ -1,39 +1,35 @@
 /* eslint-disable react/button-has-type */
-import React, { useEffect, useState, useRef } from "react";
+import React, { useRef } from "react";
+import axios from "axios";
 
-const Vote = ({ connectedUsers }) => {
+const Vote = ({ setConnectedUsers, connectedUsers, user }) => {
   const refVoteList = useRef();
 
-  useEffect(() => {
-    //console.log("connectedUsers in Vote useEffect ", connectedUsers)
-    //console.log("connectedUsers.length in vote useEffectis ", Object.keys(connectedUsers).length)
-  }, [connectedUsers]);
 
-
-  const upvote = () => {
-    console.log("test connectedUsers in Vote ", connectedUsers)
-    console.log("test connectedUsers.length is ", Object.keys(connectedUsers).length)
-    console.log("test connections is ", connectedUsers)
-  }
-
-  const downvote = () => {
-
+  //voter, votee, voteDirection
+  const vote = async (votee, voteDirection) => {
+    try {
+      await axios.post("/api/vote", { voter: user.userName, votee, voteDirection });
+      setConnectedUsers(connectedUsers.filter(userEl => userEl.userName !== votee));
+    } catch (error) {
+      Error(error);
+    }
   }
 
   return (
     <div id = "votelist" >
       <h4>Vote on Other Users!</h4>
-      <button onClick={() => upvote()}>test</button>
       <ul ref={refVoteList}>
-        {Object.entries(connectedUsers).forEach(connectedUser => {
-         // console.log("connectedUser in the ul ", connectedUser)
-          return (
-            {/*}   <li key={1}>
-              {connectedUsers.userData.userName ? connectedUsers.userData.userName : ""}
-              <button onClick={() => upvote(connectedUsers[connectedUser.userData])}>Up</button>
-              <button onClick={() => downvote(connectedUsers[connectedUser.userData])}>Down</button>
-            </li>
-          */} )
+        {connectedUsers.map(connectedUser => {
+          if (connectedUser.userName !== user.userName) {
+            return (
+              <li key={connectedUser.userName}>
+                {connectedUser.userName}
+                <button onClick={() => vote(connectedUser.userName, "up")}>Up</button>
+                <button onClick={() => vote(connectedUser.userName, "down")}>Down</button>
+              </li>
+            )
+          }
         })}
       </ul>
     </div >
