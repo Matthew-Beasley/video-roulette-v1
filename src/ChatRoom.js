@@ -1,22 +1,23 @@
 /* eslint-disable max-statements */
 /* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useReducer } from "react";
 import axios from "axios";
 import { Session } from "@opentok/client";
 const OT = require("@opentok/client");
+import Vote from "./Vote";
 
 const ChatRoom = ({ logout, history }) => {
   const [user, setUser] = useState({});
   //this comes from the server
-  let apiKey;
-  let sessionId;
-  let token;
-  let roomname = 0;
-  let session;
-  let publisher;
-  let subscriber;
-  const connectedUsers = {};
+  const [apiKey, setApiKey] = useState(0);
+  const [sessionId, setSessionId] = useState("");
+  const [token, setToken] = useState("");
+  const [roomname, setRoomname] = useState(0);
+  const [session, setSession] = useState({});
+  const [publisher, setPublisher] = useState();
+  const [subscriber, setSubscriber] = useState();
+  const [connectedUsers, setConnectedUsers] = useState({});
   const visitedRooms = [];
   let message;
   let address;
@@ -28,6 +29,8 @@ const ChatRoom = ({ logout, history }) => {
   const refSubscriber = useRef(null);
 
   const GEOCODING_API_KEY = "lhdNJtemDRfjctoDTw5DqAYs2qr9uloY";
+
+  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
@@ -52,7 +55,6 @@ const ChatRoom = ({ logout, history }) => {
     await getUser();
   };
 
-
   const getMyLocation = () => {
     return new Promise((resolve, reject) => {
       if (navigator.geolocation) {
@@ -70,7 +72,6 @@ const ChatRoom = ({ logout, history }) => {
           resolve(location);
         });
       } else {
-        console.log("The Locator was denied. :(");
         reject(Error("The locator was denied."));
       }
     });
@@ -82,19 +83,16 @@ const ChatRoom = ({ logout, history }) => {
   
   const getAuthKeys = async () => {
     const response = await axios.post(
-      `/api/opentok/chat/${refCountSlct.current.value}`,
-      {
-        visitedRooms,
-        user,
-      }
+      `/api/opentok/chat/${refCountSlct.current.value}`, { user }
     );
 
     if (!response) {
       return new Error("Call to /api/opentok/room failed");
     } else {
-      apiKey = response.data.apiKey;
-      sessionId = response.data.sessionId;
-      token = response.data.token;
+      setApiKey(response.data.apiKey);
+      setSessionId(response.data.sessionId);
+      setToken(response.data.token);
+      setRoomname(response.data.roomName)
     }
   };
 
@@ -104,14 +102,50 @@ const ChatRoom = ({ logout, history }) => {
     }
   }
 
-  const initializeSession = () => {
-    session = OT.initSession(apiKey, sessionId);
+  useEffect(() => {
+    if (sessionId.length > 0 && apiKey !== 0) {
+      const tempsession = OT.initSession(apiKey, sessionId);
+      setSession(tempsession);
+    }
+  }, [apiKey, sessionId]);
 
-    // Subscribe to a newly created stream
+  useEffect(() => {
+    if (session && publisher) {
+      session.connect(token, function (error) {
+        // If the connection is successful, publish to the session
+        if (error) {
+          handleError(error);
+        } else {
+          session.publish(publisher, handleError);
+          visitedRooms.push(sessionId);
+        }
+      });
+      createSubscriber();
+      onSessionTasks();
+    }
+  }, [session, publisher]);
+
+  const createPublisher = () => {
+    if (!publisher) {
+      const tempPublisher = OT.initPublisher(
+        "publisher",
+        {
+          name: user.userName,
+          style: { nameDisplayMode: "on" },
+          insertMode: "append",
+          width: "180px",
+          height: "120px",
+        },
+        handleError
+      );
+      setPublisher(tempPublisher);
+    }
+  }
+
+  const createSubscriber = () => {
     if (!visitedRooms.includes(sessionId)) {
       session.on("streamCreated", function (event) {
-        console.log("the event in subscriber is ", event);
-        subscriber = session.subscribe(
+        const tempSubscriber = session.subscribe(
           event.stream,
           "subscriber",
           {
@@ -121,47 +155,24 @@ const ChatRoom = ({ logout, history }) => {
           },
           handleError
         );
-      });
+        setSubscriber(tempSubscriber)
+      }); 
     }
-    // Create a publisher
-    publisher = OT.initPublisher(
-      "publisher",
-      {
-        name: user.userName,
-        style: { nameDisplayMode: "on" },
-        insertMode: "append",
-        width: "180px",
-        height: "120px",
-      },
-      handleError
-    );
+  }
 
-    // Connect to the session
-    session.connect(token, function (error) {
-      // If the connection is successful, publish to the session
-      if (error) {
-        handleError(error);
-      } else {
-        session.publish(publisher, handleError);
-        visitedRooms.push(sessionId);
-      }
-    });
+  const onSessionTasks = () => {
     session.on("connectionCreated", function connectionCreated(event) {
       const userData = JSON.parse(event.connection.data);
+      userData.connectionId = event.connection.connectionId;
       connectedUsers[userData.userName] = userData;
+      setConnectedUsers({ ...connectedUsers });
     });
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
       delete connectedUsers[userData.userName];
+      setConnectedUsers({ ...connectedUsers });
     });
-    // Receive a signal from peer
-    session.on("signal:disconnect", function signalCallback(event) {
-      if (event.data === "disconnect") {
-        alert(`${user.userName} has disconnected (on purpose I hope!)`);
-      } else {
-        alert(event.data);
-      }
-    });
+    
     // Receive a message and append it to the history
     session.on("signal:msg", function signalCallback(event) {
       const sender = JSON.parse(session.connection.data).userName;
@@ -175,7 +186,7 @@ const ChatRoom = ({ logout, history }) => {
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
     });
-  };
+  }
 
   // Text chat
   // Send a signal once the user enters data in the form
@@ -197,42 +208,22 @@ const ChatRoom = ({ logout, history }) => {
     refMsgBox.current.value = ""; //do I have to empty message here as well?
   };
 
-  const sendDisconnectSignal = () => {
-    return new Promise((resolve, reject) => {
-      session.signal(
-        {
-          type: "disconnect",
-          data: "disconnect",
-        },
-        function signalCallback(error) {
-          if (error) {
-            console.error("Error sending signal:", error.name, error.message);
-            reject(error);
-          } else {
-            resolve("Signal sent successfully");
-          }
-        }
-      );
-    });
-  };
-
   const leaveSession = async () => {
     refJoinBttn.current.disabled = false;
-    await sendDisconnectSignal();
     try {
       await axios.post(`/api/opentok/decrimentsession/${roomname}`);
     } catch (err) {
-      console.log(err);
+      Error(err);
     }
     if (subscriber) {
       session.unsubscribe(subscriber);
-      //subscriber.destroy();
     }
-    session.unpublish(publisher);
     session.disconnect();
-    publisher.destroy();
+    session.unpublish(publisher);
+    forceUpdate();
   };
 
+  //do I need to have this function?
   const sendStopSignal = async () => {
     refMsgDiv.current.innerText = "";
     await leaveSession();
@@ -241,7 +232,7 @@ const ChatRoom = ({ logout, history }) => {
   const joinRandomSession = async () => {
     refJoinBttn.current.disabled = true;
     await getAuthKeys();
-    initializeSession();
+    createPublisher();
   };
 
   const goHome = async () => {
@@ -251,14 +242,6 @@ const ChatRoom = ({ logout, history }) => {
     logout();
     history.push("/login");
   };
-
-  const upvote = () => {
-    console.log("refSubscriber is ", refSubscriber)
-  }
-
-  const downvote = () => {
-    
-  }
 
   return (
     <div className="h-100">
@@ -375,7 +358,6 @@ const ChatRoom = ({ logout, history }) => {
                 <div id="videoContainer" className="h-100">
                   <div id="subscriber" ref={refSubscriber} className="h-100 w-100" />
                   <div id="bottomCorner">
-                    <button onClick={() => upvote()}>up</button>
                     <div id="publisher" />
                   </div>
                 </div>
@@ -395,6 +377,7 @@ const ChatRoom = ({ logout, history }) => {
                   />
                 </form>
               </div>
+              <Vote connectedUsers={connectedUsers} />
             </div>
           </div>
         </div>
