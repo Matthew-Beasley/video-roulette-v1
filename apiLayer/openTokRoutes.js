@@ -4,9 +4,6 @@ const openTokRouter = express.Router();
 const apiKey = process.env.TOKBOX_API_KEY;
 const secret = process.env.TOKBOX_SECRET;
 
-//const apiKey = 46648222;
-//const secret = "633543163127909d7a0d4e2c3007a4ac486ef81a";
-
 var OpenTok = require("opentok");
 var opentok = new OpenTok(apiKey, secret);
 
