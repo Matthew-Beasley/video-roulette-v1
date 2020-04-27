@@ -48,6 +48,7 @@ const ChatRoom = ({ logout, history }) => {
 
   window.onunload = function () {
     logout();
+    publisher.destroy();
   };
 
   const callGetLocation = async () => {
@@ -240,6 +241,7 @@ const ChatRoom = ({ logout, history }) => {
       await sendStopSignal();
     }
     logout();
+    publisher.destroy();
     history.push("/login");
   };
 
