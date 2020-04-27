@@ -4,7 +4,7 @@ if (!process.env.IS_PRODUCTION) {
 
 const express = require("express");
 const path = require("path");
-const cors = require("cors");x");
+const cors = require("cors");
 const { apiRouter } = require("./apiLayer/apiRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
