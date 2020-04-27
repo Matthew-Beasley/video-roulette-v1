@@ -96,7 +96,7 @@ authRouter.get("/", (req, res) => {
   res.redirect(url);
 });
 
-module.exports = { authRouter };
+module.exports = authRouter;
 
 // const authRouter = require("express").Router();
 

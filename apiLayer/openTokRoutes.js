@@ -95,4 +95,4 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
   }
 });
 
-module.exports = { openTokRouter };
+module.exports = openTokRouter;
