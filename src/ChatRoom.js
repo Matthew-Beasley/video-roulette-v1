@@ -175,10 +175,10 @@ const ChatRoom = ({ logout, history }) => {
     
     // Receive a message and append it to the history
     session.on("signal:msg", function signalCallback(event) {
-      const sender = JSON.parse(session.connection.data).userName;
-      const msg = refMsgDiv.current; //.createElement("p");
+      const sender = JSON.parse(event.from.data).userName;
+      const msg = refMsgDiv.current;
       msg.innerText += `
-      ${sender}
+      (${sender})
       ${event.data}
       `;
       msg.scrollTop = msg.scrollHeight;
