@@ -17,7 +17,7 @@ const ChatRoom = ({ logout, history }) => {
   const [session, setSession] = useState({});
   const [publisher, setPublisher] = useState();
   const [subscriber, setSubscriber] = useState();
-  const [connectedUsers, setConnectedUsers] = useState({});
+  const [connectedUsers, setConnectedUsers] = useState([]);
   const visitedRooms = [];
   let message;
   let address;
@@ -164,13 +164,12 @@ const ChatRoom = ({ logout, history }) => {
     session.on("connectionCreated", function connectionCreated(event) {
       const userData = JSON.parse(event.connection.data);
       userData.connectionId = event.connection.connectionId;
-      connectedUsers[userData.userName] = userData;
-      setConnectedUsers({ ...connectedUsers });
+      connectedUsers.push(userData);
+      setConnectedUsers([...connectedUsers]);
     });
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
-      delete connectedUsers[userData.userName];
-      setConnectedUsers({ ...connectedUsers });
+      setConnectedUsers(connectedUsers.filter(userEl => userEl.userName !== userData.userName));
     });
     
     // Receive a message and append it to the history
@@ -220,6 +219,7 @@ const ChatRoom = ({ logout, history }) => {
     }
     session.disconnect();
     session.unpublish(publisher);
+    setConnectedUsers([]);
     forceUpdate();
   };
 
@@ -377,7 +377,10 @@ const ChatRoom = ({ logout, history }) => {
                   />
                 </form>
               </div>
-              <Vote connectedUsers={connectedUsers} />
+              <Vote
+                connectedUsers={connectedUsers}
+                user={user} setConnectedUsers={setConnectedUsers}
+              />
             </div>
           </div>
         </div>
