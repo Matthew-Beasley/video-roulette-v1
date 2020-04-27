@@ -72,7 +72,6 @@ const ChatRoom = ({ logout, history }) => {
           resolve(location);
         });
       } else {
-        console.log("The Locator was denied. :(");
         reject(Error("The locator was denied."));
       }
     });
@@ -95,7 +94,6 @@ const ChatRoom = ({ logout, history }) => {
       setToken(response.data.token);
       setRoomname(response.data.roomName)
     }
-    console.log("sessionId in getAuthKeys ". sessionId)
   };
 
   function handleError(error) {
@@ -103,7 +101,6 @@ const ChatRoom = ({ logout, history }) => {
       alert(error.message);
     }
   }
-
 
   useEffect(() => {
     if (sessionId.length > 0 && apiKey !== 0) {
@@ -114,7 +111,6 @@ const ChatRoom = ({ logout, history }) => {
 
   useEffect(() => {
     if (session && publisher) {
-      console.log("sessionin before session.connect is ", session)
       session.connect(token, function (error) {
         // If the connection is successful, publish to the session
         if (error) {
@@ -174,17 +170,9 @@ const ChatRoom = ({ logout, history }) => {
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
       delete connectedUsers[userData.userName];
-      console.log("connectedUsers in event handler ", connectedUsers);
       setConnectedUsers({ ...connectedUsers });
     });
-    // Receive a signal from peer
-    session.on("signal:disconnect", function signalCallback(event) {
-      if (event.data === "disconnect") {
-        //alert(`${user.userName} has disconnected (on purpose I hope!)`);
-      } else {
-        alert(event.data);
-      }
-    });
+    
     // Receive a message and append it to the history
     session.on("signal:msg", function signalCallback(event) {
       const sender = JSON.parse(session.connection.data).userName;
@@ -220,28 +208,8 @@ const ChatRoom = ({ logout, history }) => {
     refMsgBox.current.value = ""; //do I have to empty message here as well?
   };
 
-  const sendDisconnectSignal = () => {
-    return new Promise((resolve, reject) => {
-      session.signal(
-        {
-          type: "disconnect",
-          data: "disconnect",
-        },
-        function signalCallback(error) {
-          if (error) {
-            console.error("Error sending signal:", error.name, error.message);
-            reject(error);
-          } else {
-            resolve("Signal sent successfully");
-          }
-        }
-      );
-    });
-  };
-
   const leaveSession = async () => {
     refJoinBttn.current.disabled = false;
-    await sendDisconnectSignal();
     try {
       await axios.post(`/api/opentok/decrimentsession/${roomname}`);
     } catch (err) {
@@ -249,15 +217,13 @@ const ChatRoom = ({ logout, history }) => {
     }
     if (subscriber) {
       session.unsubscribe(subscriber);
-      //subscriber.destroy();
-      //forceUpdate();
     }
     session.disconnect();
     session.unpublish(publisher);
-    //publisher.destroy();
     forceUpdate();
   };
 
+  //do I need to have this function?
   const sendStopSignal = async () => {
     refMsgDiv.current.innerText = "";
     await leaveSession();
