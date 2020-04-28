@@ -30,7 +30,7 @@ const ChatRoom = ({ logout, history }) => {
 
   const GEOCODING_API_KEY = "lhdNJtemDRfjctoDTw5DqAYs2qr9uloY";
 
-  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const getUser = async () => {
     const email = window.localStorage.getItem("email");
@@ -68,7 +68,7 @@ const ChatRoom = ({ logout, history }) => {
           location = {
             City: address.addresses[0].address.municipality,
             State: address.addresses[0].address.countrySubdivision,
-            Country: address.addresses[0].address.countryCodeISO3
+            Country: address.addresses[0].address.countryCodeISO3,
           };
           resolve(location);
         });
@@ -81,10 +81,11 @@ const ChatRoom = ({ logout, history }) => {
   useEffect(() => {
     callGetLocation();
   }, []);
-  
+
   const getAuthKeys = async () => {
     const response = await axios.post(
-      `/api/opentok/chat/${refCountSlct.current.value}`, { user }
+      `/api/opentok/chat/${refCountSlct.current.value}`,
+      { user }
     );
 
     if (!response) {
@@ -93,7 +94,7 @@ const ChatRoom = ({ logout, history }) => {
       setApiKey(response.data.apiKey);
       setSessionId(response.data.sessionId);
       setToken(response.data.token);
-      setRoomname(response.data.roomName)
+      setRoomname(response.data.roomName);
     }
   };
 
@@ -130,18 +131,19 @@ const ChatRoom = ({ logout, history }) => {
     if (!publisher) {
       const tempPublisher = OT.initPublisher(
         "publisher",
+
         {
           name: user.userName,
-          style: { nameDisplayMode: "on" },
           insertMode: "append",
-          width: "180px",
-          height: "120px",
+          style: { nameDisplayMode: "on" },
+          width: "160px",
+          height: "101px",
         },
         handleError
       );
       setPublisher(tempPublisher);
     }
-  }
+  };
 
   const createSubscriber = () => {
     if (!visitedRooms.includes(sessionId)) {
@@ -152,14 +154,14 @@ const ChatRoom = ({ logout, history }) => {
           {
             insertMode: "append",
             width: "100%",
-            height: "500px",
+            height: "400px",
           },
           handleError
         );
-        setSubscriber(tempSubscriber)
-      }); 
+        setSubscriber(tempSubscriber);
+      });
     }
-  }
+  };
 
   const onSessionTasks = () => {
     session.on("connectionCreated", function connectionCreated(event) {
@@ -170,9 +172,11 @@ const ChatRoom = ({ logout, history }) => {
     });
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
-      setConnectedUsers(connectedUsers.filter(userEl => userEl.userName !== userData.userName));
+      setConnectedUsers(
+        connectedUsers.filter((userEl) => userEl.userName !== userData.userName)
+      );
     });
-    
+
     // Receive a message and append it to the history
     session.on("signal:msg", function signalCallback(event) {
       const sender = JSON.parse(event.from.data).userName;
@@ -186,7 +190,7 @@ const ChatRoom = ({ logout, history }) => {
     publisher.on("streamDestroyed", function (event) {
       event.preventDefault();
     });
-  }
+  };
 
   // Text chat
   // Send a signal once the user enters data in the form
@@ -330,59 +334,113 @@ const ChatRoom = ({ logout, history }) => {
           </form>
         </div>
       </nav>
-      <div>
-        Party Size &nbsp;&nbsp;
-        <select id="participants" ref={refCountSlct}>
-          <optgroup label="Participants">
-            <option value="2">One on One</option>
-            <option value="9">A Crowd is Fun</option>
-          </optgroup>
-          <optgroup label="something else">
-            <option value="something">Something else</option>
-          </optgroup>
-        </select>
-        <button
-          type="button"
-          ref={refJoinBttn}
-          onClick={() => joinRandomSession()}
-        >
-          Start A Party
-        </button>
-        <button type="button" onClick={() => sendStopSignal()}>
-          Leave The Party
-        </button>
-      </div>
-      <div className="container h-auto">
+      <div id="partyButtons">
         <div className="row h-100">
-          <div className="col-sm-12 h-100">
-            <div className="d-flex flex-row">
-              <div id="players" className="h-100 w-100">
-                <div id="videoContainer" className="h-100">
-                  <div id="subscriber" ref={refSubscriber} className="h-100 w-100" />
+          <div className="my-auto col-sm-12">
+            <div>
+              Party Size &nbsp;&nbsp;
+              <select id="participants" ref={refCountSlct}>
+                <optgroup label="Participants">
+                  <option value="2">One on One</option>
+                  <option value="9">A Crowd is Fun</option>
+                </optgroup>
+              </select>
+              <br />
+              <br />
+              <button
+                type="button"
+                className="btn-md btn-outline-dark"
+                ref={refJoinBttn}
+                onClick={() => joinRandomSession()}
+              >
+                Start A Party
+              </button>
+              &nbsp;&nbsp;
+              <button
+                className="btn-md btn-outline-dark"
+                type="button"
+                onClick={() => sendStopSignal()}
+              >
+                Leave The Party
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="container-lg h-100">
+        <div className="row h-100">
+          <div className="col-sm-12 mt-80 mx-auto justify-content-center text-center">
+            {connectedUsers.length < 2 ? (
+              <div>
+                <h2>
+                  1. Choose Your Party Size
+                  <br />
+                  2. Press Start A Party
+                  <br />
+                  3. Wait For Someone To Join!
+                  <br />
+                  <br />
+                  &#x28;Remember To Downvote The Dinguses&#x29;
+                </h2>
+              </div>
+            ) : (
+              ""
+            )}
+            <div className="d-flex flex-row row h-100">
+              <div
+                id="players"
+                className={
+                  connectedUsers.length < 2
+                    ? "d-none col-sm-7 h-100 mh-100"
+                    : "col-sm-7 h-100 mh-100"
+                }
+              >
+                <div id="videoContainer" className="row h-auto mh-100">
+                  <div
+                    id="subscriber"
+                    ref={refSubscriber}
+                    className="mh-100 h-auto w-100"
+                  />
                   <div id="bottomCorner">
-                    <div id="publisher" />
+                    <div id="publisher" className="mh-100 h-auto w-100" />
                   </div>
                 </div>
               </div>
-              <div id="textchat-display">
-                <div id="message-box" ref={refMsgDiv} />
-                <form onSubmit={(ev) => sendMessage(ev)}>
-                  <input
-                    type="text"
-                    placeholder="Input your text here"
-                    id="msg-text"
-                    ref={refMsgBox}
-                    value={message}
-                    onChange={(ev) => {
-                      message = ev.target.value;
-                    }} //create form component so video isn't interupted by rerender
+              <div className="col-sm-5 mh-50">
+                <div
+                  id="textchat-display"
+                  className={
+                    connectedUsers.length < 2
+                      ? "d-none col-sm-12 mh-50 h-100"
+                      : "col-sm-12 mh-50 h-100"
+                  }
+                >
+                  <Vote
+                    connectedUsers={connectedUsers}
+                    user={user}
+                    setConnectedUsers={setConnectedUsers}
                   />
-                </form>
+                  <br />
+                  <div className="row">
+                    <div className="col-sm-12">
+                      <div id="message-box" ref={refMsgDiv} />
+                      <form onSubmit={(ev) => sendMessage(ev)}>
+                        <input
+                          type="text"
+                          placeholder="Input your text here"
+                          id="msg-text"
+                          className="w-100"
+                          ref={refMsgBox}
+                          value={message}
+                          onChange={(ev) => {
+                            message = ev.target.value;
+                          }} //create form component so video isn't interupted by rerender
+                        />
+                      </form>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <Vote
-                connectedUsers={connectedUsers}
-                user={user} setConnectedUsers={setConnectedUsers}
-              />
             </div>
           </div>
         </div>

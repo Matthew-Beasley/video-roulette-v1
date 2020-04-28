@@ -5,35 +5,46 @@ import axios from "axios";
 const Vote = ({ setConnectedUsers, connectedUsers, user }) => {
   const refVoteList = useRef();
 
-
   //voter, votee, voteDirection
   const vote = async (votee, voteDirection) => {
     try {
-      await axios.post("/api/vote", { voter: user.userName, votee, voteDirection });
-      setConnectedUsers(connectedUsers.filter(userEl => userEl.userName !== votee));
+      await axios.post("/api/vote", {
+        voter: user.userName,
+        votee,
+        voteDirection,
+      });
+      setConnectedUsers(
+        connectedUsers.filter((userEl) => userEl.userName !== votee)
+      );
     } catch (error) {
       Error(error);
     }
-  }
+  };
 
   return (
-    <div id = "votelist" >
+    <div id="votelist" className="text">
       <h4>Vote on Other Users!</h4>
       <ul ref={refVoteList}>
-        {connectedUsers.map(connectedUser => {
+        {connectedUsers.map((connectedUser) => {
           if (connectedUser.userName !== user.userName) {
             return (
               <li key={connectedUser.userName}>
                 {connectedUser.userName}
-                <button onClick={() => vote(connectedUser.userName, "up")}>Up</button>
-                <button onClick={() => vote(connectedUser.userName, "down")}>Down</button>
+                &nbsp;&nbsp;
+                <button onClick={() => vote(connectedUser.userName, "up")}>
+                  &#x1f44d;
+                </button>
+                &nbsp;
+                <button onClick={() => vote(connectedUser.userName, "down")}>
+                  &#x1F44E;
+                </button>
               </li>
-            )
+            );
           }
         })}
       </ul>
-    </div >
-  )
-}
+    </div>
+  );
+};
 
 export default Vote;
