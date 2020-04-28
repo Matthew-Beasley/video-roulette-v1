@@ -22,11 +22,12 @@ const ChatRoom = ({ logout, history }) => {
   let message;
   let address;
   let location;
-  const refMsgDiv = useRef(null);
-  const refMsgBox = useRef(null);
-  const refJoinBttn = useRef(null);
-  const refCountSlct = useRef(null);
-  const refSubscriber = useRef(null);
+  const refMsgDiv = useRef();
+  const refMsgBox = useRef();
+  const refJoinBttn = useRef();
+  const refLeaveBttn = useRef()
+  const refCountSlct = useRef();
+  const refSubscriber = useRef();
 
   const GEOCODING_API_KEY = "lhdNJtemDRfjctoDTw5DqAYs2qr9uloY";
 
@@ -214,6 +215,7 @@ const ChatRoom = ({ logout, history }) => {
 
   const leaveSession = async () => {
     refJoinBttn.current.disabled = false;
+    refLeaveBttn.current.disabled = true;
     try {
       await axios.post(`/api/opentok/decrimentsession/${roomname}`);
     } catch (err) {
@@ -236,6 +238,7 @@ const ChatRoom = ({ logout, history }) => {
 
   const joinRandomSession = async () => {
     refJoinBttn.current.disabled = true;
+    refLeaveBttn.current.disabled = false;
     await getAuthKeys();
     createPublisher();
   };
@@ -359,6 +362,7 @@ const ChatRoom = ({ logout, history }) => {
               <button
                 className="btn-md btn-outline-dark"
                 type="button"
+                ref={refLeaveBttn}
                 onClick={() => sendStopSignal()}
               >
                 Leave The Party
