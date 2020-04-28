@@ -1,9 +1,8 @@
 /* eslint-disable react/button-has-type */
-import React, { useRef } from "react";
+import React from "react";
 import axios from "axios";
 
 const Vote = ({ setConnectedUsers, connectedUsers, user }) => {
-  const refVoteList = useRef();
 
   //voter, votee, voteDirection
   const vote = async (votee, voteDirection) => {
@@ -24,7 +23,7 @@ const Vote = ({ setConnectedUsers, connectedUsers, user }) => {
   return (
     <div id="votelist" className="text">
       <h4>Vote on Other Users!</h4>
-      <ul ref={refVoteList}>
+      <ul>
         {connectedUsers.map((connectedUser) => {
           if (connectedUser.userName !== user.userName) {
             return (

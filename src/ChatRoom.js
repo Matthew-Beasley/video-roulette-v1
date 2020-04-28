@@ -18,6 +18,7 @@ const ChatRoom = ({ logout, history }) => {
   const [publisher, setPublisher] = useState();
   const [subscriber, setSubscriber] = useState();
   const [connectedUsers, setConnectedUsers] = useState([]);
+  const [connectionIsLoading, setConnectionIsLoading] = useState(false);
   const visitedRooms = [];
   let message;
   let address;
@@ -170,6 +171,7 @@ const ChatRoom = ({ logout, history }) => {
       userData.connectionId = event.connection.connectionId;
       connectedUsers.push(userData);
       setConnectedUsers([...connectedUsers]);
+      setConnectionIsLoading(false);
     });
     session.on("connectionDestroyed", function connectionDestroyed(event) {
       const userData = JSON.parse(event.connection.data);
@@ -239,6 +241,7 @@ const ChatRoom = ({ logout, history }) => {
   const joinRandomSession = async () => {
     refJoinBttn.current.disabled = true;
     refLeaveBttn.current.disabled = false;
+    setConnectionIsLoading(true)
     await getAuthKeys();
     createPublisher();
   };
@@ -386,6 +389,11 @@ const ChatRoom = ({ logout, history }) => {
                   <br />
                   &#x28;Remember To Downvote The Dinguses&#x29;
                 </h2>
+                {connectionIsLoading && (
+                  <h3 style={{ color: "red" }}>
+                    Hold on a sec, connection is loading...
+                  </h3>
+                )}
               </div>
             ) : (
               ""
