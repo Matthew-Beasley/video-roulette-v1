@@ -1,4 +1,4 @@
-/* eslint-disable guard-for-in */
+ /* eslint-disable guard-for-in */
 const { client } = require("./client");
 const { hash } = require("./auth");
 
@@ -9,12 +9,12 @@ const createUser = async ({
   email,
   password,
   googleId,
-  imageURL,
+  imageURL
 }) => {
   const sql = `
   INSERT INTO users ("userName", "firstName", "lastName", email, password, "googleId", "imageURL")
   VALUES ($1, $2, $3, $4, $5, $6, $7)
-  RETURNING *;`;
+  RETURNING * ;`;
   return (
     await client.query(sql, [
       userName,
@@ -23,7 +23,7 @@ const createUser = async ({
       email,
       await hash(password),
       googleId,
-      imageURL,
+      imageURL
     ])
   ).rows[0];
 };
