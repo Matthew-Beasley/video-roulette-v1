@@ -39,7 +39,6 @@ const ChatRoom = ({ logout, history }) => {
     const temp = response.data;
     temp.location = location;
     setUser(temp);
-    console.log(user);
   };
 
   useEffect(() => {
@@ -47,6 +46,13 @@ const ChatRoom = ({ logout, history }) => {
       sendStopSignal().then((result) => console.log(result));
     }
   }, [history]);
+
+  useEffect(() => {
+    refJoinBttn.current.disabled = true;
+    if (user.firstName) {
+      refJoinBttn.current.disabled = false;
+    }
+  }, [user])
 
   window.onunload = function () {
     logout();
