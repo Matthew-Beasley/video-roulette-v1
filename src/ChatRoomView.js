@@ -167,7 +167,6 @@ const ChatRoomView = (props) => {
                   <Vote
                     connectedUsers={connectedUsers}
                     user={user}
-                    setConnectedUsers={setConnectedUsers}
                   />
                   <br />
                   <div className="row">

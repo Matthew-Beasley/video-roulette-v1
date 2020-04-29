@@ -1,9 +1,8 @@
 /* eslint-disable react/button-has-type */
-import React from "react";
+import React, {useState} from "react";
 import axios from "axios";
 
-const Vote = ({ setConnectedUsers, connectedUsers, user }) => {
-
+const Vote = ({ connectedUsers, user }) => {
   //voter, votee, voteDirection
   const vote = async (votee, voteDirection) => {
     try {
@@ -12,9 +11,6 @@ const Vote = ({ setConnectedUsers, connectedUsers, user }) => {
         votee,
         voteDirection,
       });
-      setConnectedUsers(
-        connectedUsers.filter((userEl) => userEl.userName !== votee)
-      );
     } catch (error) {
       Error(error);
     }
@@ -30,11 +26,19 @@ const Vote = ({ setConnectedUsers, connectedUsers, user }) => {
               <li key={connectedUser.userName}>
                 {connectedUser.userName}
                 &nbsp;&nbsp;
-                <button onClick={() => vote(connectedUser.userName, "up")}>
+                <button
+                  onClick={() => {
+                    vote(connectedUser.userName, "up");
+                  }}
+                >
                   &#x1f44d;
                 </button>
                 &nbsp;
-                <button onClick={() => vote(connectedUser.userName, "down")}>
+                <button
+                  onClick={() => {
+                    vote(connectedUser.userName, "down");
+                  }}
+                >
                   &#x1F44E;
                 </button>
               </li>
