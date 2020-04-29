@@ -111,9 +111,9 @@ const ChatRoomView = (props) => {
           </div>
         </div>
       </div>
-      <div className="container-lg h-100">
+      <div className="container-lg h-100 mh-100">
         <div className="row h-100">
-          <div className="col-sm-12 mt-80 mx-auto justify-content-center text-center">
+          <div className="col-sm-12 mt-80 mx-auto justify-content-center text-center h-100 mh-100">
             {connectedUsers.length < 2 ? (
               <div>
                 <h2>
@@ -140,7 +140,7 @@ const ChatRoomView = (props) => {
             ) : (
               ""
             )}
-            <div className="d-flex flex-row row h-100">
+            <div className="d-flex flex-row row h-100 mh-100">
               <div
                 id="players"
                 className={
@@ -149,11 +149,11 @@ const ChatRoomView = (props) => {
                     : "col-sm-7 h-100 mh-100"
                 }
               >
-                <div id="videoContainer" className="row h-auto mh-100">
+                <div id="videoContainer" className="row h-auto">
                   <div
                     id="subscriber"
                     ref={refSubscriber}
-                    className="mh-100 h-auto w-100"
+                    className="mh-100 h-100 w-100"
                   />
                   <div id="bottomCorner">
                     <div id="publisher" className="mh-100 h-auto w-100" />
