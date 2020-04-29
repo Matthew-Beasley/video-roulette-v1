@@ -56,8 +56,7 @@ const ChatRoomView = (props) => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#/chat">
-                {/* Need to change the href here once we have voting up */}
+              <a className="nav-link" href="#/leaderboards">
                 Leaderboards
               </a>
             </li>
@@ -169,10 +168,7 @@ const ChatRoomView = (props) => {
                       : "col-sm-12 mh-50 h-100"
                   }
                 >
-                  <Vote
-                    connectedUsers={connectedUsers}
-                    user={user}
-                  />
+                  <Vote connectedUsers={connectedUsers} user={user} />
                   <br />
                   <div className="row">
                     <div className="col-sm-12">

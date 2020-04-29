@@ -6,6 +6,7 @@ import ChatRoom from "./ChatRoom";
 import Login from "./Login";
 import axios from "axios";
 import CreateUsername from "./CreateUsername";
+import Leaderboards from "./Leaderboards";
 
 // const headers = () => {
 //   const token = window.localStorage.getItem("token");
@@ -76,6 +77,7 @@ const App = () => {
           render={() => <CreateUsername logout={logout} history={history} />}
         />
         <Route path="/login" render={() => <Login login={login} />} />
+        <Route path="/leaderboards" render={() => <Leaderboards />} />
       </div>
     );
   }
