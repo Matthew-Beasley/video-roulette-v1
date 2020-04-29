@@ -1,10 +1,8 @@
 const express = require("express");
 const openTokRouter = express.Router();
 
-// var apiKey = process.env.TOKBOX_API_KEY;
-// var secret = process.env.TOKBOX_SECRET;
-const apiKey = 46648222;
-const secret = "633543163127909d7a0d4e2c3007a4ac486ef81a";
+const apiKey = process.env.TOKBOX_API_KEY;
+const secret = process.env.TOKBOX_SECRET;
 
 var OpenTok = require("opentok");
 var opentok = new OpenTok(apiKey, secret);
@@ -50,7 +48,7 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
   let token;
   const tokenOptions = {};
   const { memberscount } = req.params;
-  const { visitedRooms, user } = req.body;
+  const { user } = req.body;
   let roomName = findAvailableRoom(memberscount);
 
   // we should now have an available room, if not drop down to create a room
@@ -66,7 +64,7 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
       apiKey: apiKey,
       sessionId: sessionId,
       token: token,
-      dictionary: roomToSessionIdDictionary,
+      roomName: roomName,
     });
     // this is the first time the room is being accessed, create a new session ID
   } else if (!roomName) {
@@ -91,10 +89,10 @@ openTokRouter.post("/chat/:memberscount", function (req, res, next) {
         apiKey: apiKey,
         sessionId: session.sessionId,
         token: token,
-        dictionary: roomToSessionIdDictionary,
+        roomName: roomName,
       });
     });
   }
 });
 
-module.exports = { openTokRouter };
+module.exports = openTokRouter;
