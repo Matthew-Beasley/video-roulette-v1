@@ -19,7 +19,7 @@ const ChatRoom = ({ logout, history }) => {
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [connectionIsLoading, setConnectionIsLoading] = useState(false);
   const visitedRooms = [];
-  let message;
+  const [message, setMessage] = useState("");
   let address;
   let location;
   const refMsgDiv = useRef();
@@ -277,6 +277,7 @@ const ChatRoom = ({ logout, history }) => {
       refMsgDiv={refMsgDiv}
       sendMessage={sendMessage}
       refMsgBox={refMsgBox}
+      setMessage={setMessage}
       message={message}
     />
   );

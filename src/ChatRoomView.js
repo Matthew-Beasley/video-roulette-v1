@@ -13,10 +13,10 @@ const ChatRoomView = (props) => {
     connectedUsers,
     connectionIsLoading,
     refSubscriber,
-    setConnectedUsers,
     refMsgDiv,
     sendMessage,
     refMsgBox,
+    setMessage,
     message,
   } = props;
 
@@ -186,7 +186,7 @@ const ChatRoomView = (props) => {
                           ref={refMsgBox}
                           value={message}
                           onChange={(ev) => {
-                            message = ev.target.value;
+                            setMessage(ev.target.value);
                           }} //create form component so video isn't interupted by rerender
                         />
                       </form>
