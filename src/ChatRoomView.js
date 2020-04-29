@@ -17,7 +17,7 @@ const ChatRoomView = (props) => {
     refMsgDiv,
     sendMessage,
     refMsgBox,
-    message
+    message,
   } = props;
 
   return (
@@ -33,8 +33,8 @@ const ChatRoomView = (props) => {
               alt=""
             />
           ) : (
-              <img src="../assets/orgCicon.png" width="40" height="40" alt="" />
-            )}
+            <img src="../assets/orgCicon.png" width="40" height="40" alt="" />
+          )}
         </a>
         <button
           className="navbar-toggler"
@@ -58,7 +58,7 @@ const ChatRoomView = (props) => {
             <li className="nav-item">
               <a className="nav-link" href="#/chat">
                 {/* Need to change the href here once we have voting up */}
-              Leaderboards
+                Leaderboards
               </a>
             </li>
           </ul>
@@ -100,12 +100,12 @@ const ChatRoomView = (props) => {
               </button>
               &nbsp;&nbsp;
               <button
-                  className="btn-md btn-outline-dark"
-                  type="button"
-                  ref={refLeaveBttn}
-                  onClick={() => sendStopSignal()}
-                >
-                  Leave The Party
+                className="btn-md btn-outline-dark"
+                type="button"
+                ref={refLeaveBttn}
+                onClick={() => sendStopSignal()}
+              >
+                Leave The Party
               </button>
             </div>
           </div>
@@ -118,23 +118,25 @@ const ChatRoomView = (props) => {
               <div>
                 <h2>
                   1. Choose Your Party Size
-                <br />
-                2. Press Start A Party
-                <br />
-                3. Wait For Someone To Join!
-                <br />
                   <br />
-                &#x28;Remember To Downvote The Dinguses&#x29;
+                  2. Press Start A Party
+                  <br />
+                  3. Wait For Someone To Join!
+                  <br />
+                  <br />
+                  &#x28;Remember To Downvote The Dinguses&#x29;
                 </h2>
-                {connectionIsLoading && (
+                {connectedUsers.length === 1 ? (
                   <h3 style={{ color: "red" }}>
-                    Hold on a sec, connection is loading...
+                    Hold On A Sec, Finding Someone To Join...
                   </h3>
+                ) : (
+                  ""
                 )}
               </div>
             ) : (
-                ""
-              )}
+              ""
+            )}
             <div className="d-flex flex-row row h-100">
               <div
                 id="players"
@@ -194,8 +196,7 @@ const ChatRoomView = (props) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ChatRoomView;
-

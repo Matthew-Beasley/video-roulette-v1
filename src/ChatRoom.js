@@ -25,7 +25,7 @@ const ChatRoom = ({ logout, history }) => {
   const refMsgDiv = useRef();
   const refMsgBox = useRef();
   const refJoinBttn = useRef();
-  const refLeaveBttn = useRef()
+  const refLeaveBttn = useRef();
   const refCountSlct = useRef();
   const refSubscriber = useRef();
 
@@ -39,6 +39,7 @@ const ChatRoom = ({ logout, history }) => {
     const temp = response.data;
     temp.location = location;
     setUser(temp);
+    console.log(user);
   };
 
   useEffect(() => {
@@ -240,7 +241,7 @@ const ChatRoom = ({ logout, history }) => {
   const joinRandomSession = async () => {
     refJoinBttn.current.disabled = true;
     refLeaveBttn.current.disabled = false;
-    setConnectionIsLoading(true)
+    setConnectionIsLoading(true);
     await getAuthKeys();
     createPublisher();
   };
