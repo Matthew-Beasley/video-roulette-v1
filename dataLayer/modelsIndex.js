@@ -6,20 +6,16 @@ const {
   deleteUser,
 } = require("./usersModel");
 
-const {
-  buildDB
-} = require("./buildDB");
+const { buildDB } = require("./buildDB");
 
-const {
-  findUserFromToken,
-  authenticate,
-  compare,
-  hash } = require("./auth");
+const { findUserFromToken, authenticate, compare, hash } = require("./auth");
 
 const {
   createVote,
+  readVotes,
+  readVotesRanked,
   readVoterVotes,
-  readVoteeVotes
+  readVoteeVotes,
 } = require("./voteModel");
 
 module.exports = {
@@ -37,6 +33,8 @@ module.exports = {
   hash,
 
   createVote,
+  readVotes,
+  readVotesRanked,
   readVoterVotes,
-  readVoteeVotes
+  readVoteeVotes,
 };
