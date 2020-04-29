@@ -126,10 +126,13 @@ const ChatRoomView = (props) => {
                   <br />
                   &#x28;Remember To Downvote The Dinguses&#x29;
                 </h2>
-                {connectedUsers.length === 1 ? (
+                {connectionIsLoading && (
                   <h3 style={{ color: "red" }}>
-                    Hold On A Sec, Finding Someone To Join...
+                    Hold on a sec, connection is loading...
                   </h3>
+                )}
+                {connectedUsers.length === 1 ? (
+                  <h3 style={{ color: "red" }}>Finding Someone To Join...</h3>
                 ) : (
                   ""
                 )}
