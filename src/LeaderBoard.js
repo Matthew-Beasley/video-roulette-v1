@@ -10,7 +10,6 @@ const LeaderBoard = () => {
 
   //3) create array of  get num of up/down votes
   //   this is a super expensive operation
-  // dry this up by replacing votee with user opjects?
   const tabulateVotes = () => {
     const temp = allUsers.map(async (user) => {
       user.voteUp = 0;
@@ -24,12 +23,16 @@ const LeaderBoard = () => {
         } else {
           user.voteDown--;
         }
-        
       });
+      user.voteAvg = (user.voteDown + user.voteUp) / user.voteCount;
       return user;
     });
     Promise.all(temp)
     .then(values => setTabulatedUsers(values))
+  }
+
+  const rankUsers = () => {
+    
   }
 
   //1) get all the users
@@ -44,7 +47,7 @@ const LeaderBoard = () => {
   }, [allUsers]);
 
   useEffect(() => {
-    calcOverallScore();
+    rankUsers();
   }, [tabulatedUsers])
 
   return (
