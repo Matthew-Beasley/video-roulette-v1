@@ -6,7 +6,8 @@ const LeaderBoard = () => {
   const [tabulatedUsers, setTabulatedUsers] = useState([])
   const [topTen, setTopTen] = useState([]);
   const [bottomTen, setBottomTen] = useState([]);
-  const [rankTopBottom, setRankTopBottom] = useState([]);
+  const [rankDesc, setRankDesc] = useState([]);
+  const [rankAsc, setRankAsc] = useState([]);
 
   //3) create array of  get num of up/down votes
   //   this is a super expensive operation
@@ -32,7 +33,15 @@ const LeaderBoard = () => {
   }
 
   const rankUsers = () => {
-    
+    const sorted = tabulatedUsers;
+    sorted.sort(user => {
+      return user.voteAvg + user.voteAvg;
+    });
+    setRankDesc(sorted);
+    sorted.sort(user => {
+      return user.voteAvg + user.voteAvg;
+    });
+    setRankAsc(sorted);
   }
 
   //1) get all the users
