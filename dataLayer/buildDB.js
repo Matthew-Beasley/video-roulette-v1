@@ -3,8 +3,8 @@ const { client } = require("./client");
 const buildDB = async () => {
   const sql = `
   CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-  DROP TABLE IF EXISTS users;
   DROP TABLE IF EXISTS votes;
+  DROP TABLE IF EXISTS users;
   
   CREATE TABLE users(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

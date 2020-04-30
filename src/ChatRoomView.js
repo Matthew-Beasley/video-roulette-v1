@@ -170,10 +170,7 @@ const ChatRoomView = (props) => {
                       : "col-sm-12 mh-50 h-100"
                   }
                 >
-                  <Vote
-                    connectedUsers={connectedUsers}
-                    user={user}
-                  />
+                  <Vote connectedUsers={connectedUsers} user={user} />
                   <br />
                   <div className="row">
                     <div className="col-sm-12">
