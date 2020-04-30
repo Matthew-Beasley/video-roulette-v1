@@ -8,8 +8,6 @@ const LeaderBoard = ({ user, goHome }) => {
   const [rankDesc, setRankDesc] = useState([]);
   const [rankAsc, setRankAsc] = useState([]);
 
-  //3) create array of  get num of up/down votes
-  //   this is a super expensive operation
   const tabulateVotes = () => {
     const temp = allUsers.map(async (_user) => {
       _user.voteUp = 0;
@@ -41,12 +39,10 @@ const LeaderBoard = ({ user, goHome }) => {
     setRankAsc([...tabulatedUsers])
   };
 
-  //1) get all the users
   useEffect(() => {
     axios.get("/api/users").then((users) => setAllUsers(users.data));
   }, []);
 
-  //2) calltabulate when all the users are here
   useEffect(() => {
     tabulateVotes();
   }, [allUsers]);
@@ -116,7 +112,7 @@ const LeaderBoard = ({ user, goHome }) => {
           <table className="table">
             <thead>
               <tr>
-                <th>Users ranked in descending order</th>
+                <th>Users starting with the best!</th>
               </tr>
             </thead>
             <tbody>
@@ -144,7 +140,7 @@ const LeaderBoard = ({ user, goHome }) => {
           <table className="table">
             <thead>
               <tr>
-                <th>Users ranked worst first</th>
+                <th>Users ranked worst first!</th>
               </tr>
             </thead>
             <tbody>
