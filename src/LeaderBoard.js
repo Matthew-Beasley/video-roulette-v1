@@ -3,33 +3,33 @@ import axios from "axios";
 
 const LeaderBoard = () => {
   const [allUsers, setAllUsers] = useState([]);
-  const [tabulatedVotees, setTabulatedVotees] = useState([])
+  const [tabulatedUsers, setTabulatedUsers] = useState([])
   const [topTen, setTopTen] = useState([]);
   const [bottomTen, setBottomTen] = useState([]);
   const [rankTopBottom, setRankTopBottom] = useState([]);
 
   //3) create array of  get num of up/down votes
   //   this is a super expensive operation
+  // dry this up by replacing votee with user opjects?
   const tabulateVotes = () => {
     const temp = allUsers.map(async (user) => {
-      const votee = {}
-      votee.username = user.userName;
-      votee.up = 0;
-      votee.down = 0;
-      votee.voteCount = 0;
+      user.voteUp = 0;
+      user.voteDown = 0;
+      user.voteCount = 0;
       const votes = await axios.get(`/api/vote/votee/${user.userName}`); 
       votes.data.forEach(vote => {
-        votee.voteCount++;
+        user.voteCount++;
         if (vote.voteDirection === "up") {
-          votee.up++;
+          user.voteUp++;
         } else {
-          votee.down--;
+          user.voteDown--;
         }
+        
       });
-      return votee;
+      return user;
     });
     Promise.all(temp)
-    .then(values => setTabulatedVotees(values))
+    .then(values => setTabulatedUsers(values))
   }
 
   //1) get all the users
@@ -44,8 +44,8 @@ const LeaderBoard = () => {
   }, [allUsers]);
 
   useEffect(() => {
-    //calcAscending();
-  }, [tabulateVotes])
+    calcOverallScore();
+  }, [tabulatedUsers])
 
   return (
     <div id="leaderboard-container">
