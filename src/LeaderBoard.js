@@ -4,8 +4,6 @@ import axios from "axios";
 const LeaderBoard = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [tabulatedUsers, setTabulatedUsers] = useState([])
-  const [topTen, setTopTen] = useState([]);
-  const [bottomTen, setBottomTen] = useState([]);
   const [rankDesc, setRankDesc] = useState([]);
   const [rankAsc, setRankAsc] = useState([]);
 
@@ -61,8 +59,29 @@ const LeaderBoard = () => {
 
   return (
     <div id="leaderboard-container">
-      <h3>in the leaderboard</h3>
-
+      <table>
+        <tr>
+          <th>Users ranked in descending order</th>
+        </tr>
+        <tr>
+          <th>User</th>
+          <th>Total Votes</th>
+          <th>Total of Up Votes</th>
+          <th>Total of Down Votes</th>
+          <th>Vote Average</th>
+        </tr>
+        {rankDesc.map(user => {
+          return (
+            <tr key={user.userName}>
+              <td>{user.userName}</td>
+              <td>{user.voteCount}</td>
+              <td>{user.voteUp}</td>
+              <td>{user.voteDown}</td>
+              <td>{user.voteAvg}</td>
+            </tr>
+          )
+        })}
+      </table>
     </div>
   )
 }
