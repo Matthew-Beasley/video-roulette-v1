@@ -5,6 +5,8 @@ import React, { useRef, useEffect, useState, useReducer } from "react";
 import axios from "axios";
 const OT = require("@opentok/client");
 import ChatRoomView from "./ChatRoomView";
+import LeaderBoard from "./LeaderBoard";
+import { Route } from "react-router-dom";
 
 const ChatRoom = ({ logout, history }) => {
   const [user, setUser] = useState({});
@@ -52,7 +54,7 @@ const ChatRoom = ({ logout, history }) => {
     if (user.firstName) {
       refJoinBttn.current.disabled = false;
     }
-  }, [user])
+  }, [user]);
 
   window.onunload = function () {
     logout();
@@ -262,24 +264,27 @@ const ChatRoom = ({ logout, history }) => {
   };
 
   return (
-    <ChatRoomView
-      user={user}
-      goHome={goHome}
-      refCountSlct={refCountSlct}
-      sendStopSignal={sendStopSignal}
-      joinRandomSession={joinRandomSession}
-      refJoinBttn={refJoinBttn}
-      refLeaveBttn={refLeaveBttn}
-      connectedUsers={connectedUsers}
-      connectionIsLoading={connectionIsLoading}
-      refSubscriber={refSubscriber}
-      setConnectedUsers={setConnectedUsers}
-      refMsgDiv={refMsgDiv}
-      sendMessage={sendMessage}
-      refMsgBox={refMsgBox}
-      setMessage={setMessage}
-      message={message}
-    />
+    <div>
+      <ChatRoomView
+        user={user}
+        goHome={goHome}
+        refCountSlct={refCountSlct}
+        sendStopSignal={sendStopSignal}
+        joinRandomSession={joinRandomSession}
+        refJoinBttn={refJoinBttn}
+        refLeaveBttn={refLeaveBttn}
+        connectedUsers={connectedUsers}
+        connectionIsLoading={connectionIsLoading}
+        refSubscriber={refSubscriber}
+        setConnectedUsers={setConnectedUsers}
+        refMsgDiv={refMsgDiv}
+        sendMessage={sendMessage}
+        refMsgBox={refMsgBox}
+        setMessage={setMessage}
+        message={message}
+      />
+      <Route path="/leaderboard" render={() => <LeaderBoard user={user} />} />
+    </div>
   );
 };
 

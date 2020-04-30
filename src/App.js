@@ -19,6 +19,7 @@ import LeaderBoard from "./LeaderBoard";
 
 const App = () => {
   const [token, setToken] = useState("");
+  const [user, setUser] = useState({});
   const history = useHistory();
 
   useEffect(() => {
@@ -70,14 +71,16 @@ const App = () => {
       <div className="container h-100 mw-100">
         <Route
           path="/chat"
-          render={() => <ChatRoom logout={logout} history={history} />}
+          render={() => (
+            <ChatRoom logout={logout} history={history} user={user} />
+          )}
         />
         <Route
           path="/createusername"
           render={() => <CreateUsername logout={logout} history={history} />}
         />
         <Route path="/login" render={() => <Login login={login} />} />
-        <Route path="/leaderboard" render={() => <LeaderBoard />} />
+        <Route path="/leaderboard" render={() => <LeaderBoard user={user} />} />
       </div>
     );
   }
