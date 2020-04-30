@@ -52,9 +52,9 @@ const ChatRoomView = (props) => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
-              <a className="nav-link" href="#/chat">
+              <Link className="nav-link" to="/chat">
                 Chat <span className="sr-only">(current)</span>
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/leaderboard">
