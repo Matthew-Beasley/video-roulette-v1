@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Vote from "./Vote";
 
 const ChatRoomView = (props) => {
@@ -56,10 +57,10 @@ const ChatRoomView = (props) => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#/chat">
+              <Link className="nav-link" to="/leaderboard">
                 {/* Need to change the href here once we have voting up */}
                 Leaderboards
-              </a>
+              </Link>
             </li>
           </ul>
           <form className="form-inline my-2 my-lg-0">
