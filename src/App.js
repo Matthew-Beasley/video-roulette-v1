@@ -8,15 +8,6 @@ import axios from "axios";
 import CreateUsername from "./CreateUsername";
 import LeaderBoard from "./LeaderBoard";
 
-// const headers = () => {
-//   const token = window.localStorage.getItem("token");
-//   return {
-//     headers: {
-//       authorization: token,
-//     },
-//   };
-// };
-
 const App = () => {
   const [token, setToken] = useState("");
   const [user, setUser] = useState({});
@@ -25,11 +16,6 @@ const App = () => {
   useEffect(() => {
     setToken(window.localStorage.getItem("token"));
   }, []);
-
-  // const exchangeTokenForAuth = async () => {
-  //   const response = await axios.get("/api/simpleauth", headers());
-  //   setAuth(response.data);
-  // };
 
   const login = async (credentials) => {
     const _token = (await axios.post("/api/simpleauth", credentials)).data
@@ -45,17 +31,6 @@ const App = () => {
     history.push("/login");
   };
 
-  // const createAccount = async (newUser) => {
-  //   const response = (await axios.post("/api/simpleauth/users", newUser)).data;
-  //   window.localStorage.setItem("token", response.token);
-  // setAuth(response.user);
-  // setError("");
-  // };
-
-  // useEffect(() => {
-  //   exchangeTokenForAuth();
-  // }, []);
-  // && history.hash === "/login"
   if (!token) {
     return (
       <div className="container-lg h-100">
@@ -72,7 +47,9 @@ const App = () => {
         <Route
           path="/chat"
           render={() => (
-            <ChatRoom logout={logout} history={history} user={user} />
+            <ChatRoom
+              logout={logout} history={history}
+              user={user} setUser={setUser} />
           )}
         />
         <Route

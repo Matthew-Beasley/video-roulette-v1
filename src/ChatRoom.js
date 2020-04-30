@@ -8,8 +8,8 @@ import ChatRoomView from "./ChatRoomView";
 import LeaderBoard from "./LeaderBoard";
 import { Route } from "react-router-dom";
 
-const ChatRoom = ({ logout, history }) => {
-  const [user, setUser] = useState({});
+const ChatRoom = ({ logout, history, user, setUser }) => {
+  //const [user, setUser] = useState({});
   //this comes from the server
   const [apiKey, setApiKey] = useState(0);
   const [sessionId, setSessionId] = useState("");
@@ -283,7 +283,6 @@ const ChatRoom = ({ logout, history }) => {
         setMessage={setMessage}
         message={message}
       />
-      <Route path="/leaderboard" render={() => <LeaderBoard user={user} />} />
     </div>
   );
 };
