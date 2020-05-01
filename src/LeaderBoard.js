@@ -34,7 +34,7 @@ const LeaderBoard = ({ user, goHome }) => {
 
   const rankUsers = () => {
     tabulatedUsers.sort(function (_user) {
-      return _user.voteUp + _user.voteUp;
+      return _user.voteUp - _user.voteUp;
     });
     setRankDesc([...tabulatedUsers]);
   };
