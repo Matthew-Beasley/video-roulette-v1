@@ -164,7 +164,7 @@ const ChatRoom = ({ logout, history, user, setUser }) => {
           {
             insertMode: "append",
             width: "100%",
-            height: "300px",
+            height: "400px",
           },
           handleError
         );
