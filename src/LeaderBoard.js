@@ -25,7 +25,7 @@ const LeaderBoard = ({ user, goHome }) => {
       });
       _user.voteAvg = (_user.voteUp - _user.voteDown) / _user.voteCount;
       if (_user.voteAvg === NaN) {
-        user.voteAvg = 0;
+        _user.voteAvg = 0;
       }
       return _user;
     });
