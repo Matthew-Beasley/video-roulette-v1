@@ -139,34 +139,6 @@ const LeaderBoard = ({ user, goHome }) => {
               })}
             </tbody>
           </table>
-          <br/><br/>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Users ranked worst first!</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>User</th>
-                <th>Total Votes</th>
-                <th>Total of Up Votes</th>
-                <th>Total of Down Votes</th>
-                <th>Vote Average</th>
-              </tr>
-              {rankAsc.map((_user) => {
-                return (
-                  <tr key={_user.userName}>
-                    <td>{_user.userName}</td>
-                    <td>{_user.voteCount}</td>
-                    <td>{_user.voteUp}</td>
-                    <td>{_user.voteDown}</td>
-                    <td>{_user.voteAvg}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
