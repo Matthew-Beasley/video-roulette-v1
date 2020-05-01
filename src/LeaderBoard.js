@@ -23,6 +23,9 @@ const LeaderBoard = ({ user, goHome }) => {
         }
       });
       _user.voteAvg = (_user.voteUp - _user.voteDown) / _user.voteCount;
+      if (isNaN(user.voteAvg)) {
+        user.voteAvg = 0;
+      }
       return _user;
     });
     Promise.all(temp).then((values) => setTabulatedUsers(values));
