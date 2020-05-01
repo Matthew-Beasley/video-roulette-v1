@@ -1,3 +1,4 @@
+/* eslint-disable use-isnan */
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -23,7 +24,7 @@ const LeaderBoard = ({ user, goHome }) => {
         }
       });
       _user.voteAvg = (_user.voteUp - _user.voteDown) / _user.voteCount;
-      if (isNaN(_user.voteAvg)) {
+      if (_user.voteAvg === NaN) {
         user.voteAvg = 0;
       }
       return _user;
@@ -97,9 +98,9 @@ const LeaderBoard = ({ user, goHome }) => {
           </ul>
           <form className="form-inline my-2 my-lg-0">
             Welcome&nbsp;
-            <a className="mr-3" href="#/chat">
+            <Link className="mr-3" href="/chat">
               {user.userName}
-            </a>
+            </Link>
             <button
               className="btn-md btn-outline-dark my-2 my-sm-0"
               type="button"
