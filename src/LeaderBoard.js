@@ -24,7 +24,7 @@ const LeaderBoard = ({ user, goHome }) => {
         }
       });
       _user.voteAvg = (_user.voteUp - _user.voteDown) / _user.voteCount;
-      if (_user.voteAvg === NaN) {
+      if (isNaN(_user.voteAvg)) {
         _user.voteAvg = 0;
       }
       return _user;
@@ -40,7 +40,7 @@ const LeaderBoard = ({ user, goHome }) => {
     tabulatedUsers.sort(function (_user) {
       return _user.voteAvg + _user.voteAvg;
     });
-    setRankAsc([...tabulatedUsers])
+    setRankAsc([...tabulatedUsers]);
   };
 
   useEffect(() => {
@@ -104,7 +104,8 @@ const LeaderBoard = ({ user, goHome }) => {
             <button
               className="btn-md btn-outline-dark my-2 my-sm-0"
               type="button"
-              onClick={() => goHome()}>
+              onClick={() => goHome()}
+            >
               Logout
             </button>
           </form>
