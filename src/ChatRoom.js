@@ -164,7 +164,7 @@ const ChatRoom = ({ logout, history }) => {
           {
             insertMode: "append",
             width: "100%",
-            height: "400px",
+            height: "300px",
           },
           handleError
         );
@@ -283,7 +283,10 @@ const ChatRoom = ({ logout, history }) => {
         setMessage={setMessage}
         message={message}
       />
-      <Route path="/leaderboard" render={() => <LeaderBoard user={user} />} />
+      <Route
+        path="/leaderboard"
+        render={() => <LeaderBoard user={user} goHome={goHome} />}
+      />
     </div>
   );
 };
