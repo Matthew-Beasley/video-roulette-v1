@@ -34,13 +34,9 @@ const LeaderBoard = ({ user, goHome }) => {
 
   const rankUsers = () => {
     tabulatedUsers.sort(function (_user) {
-      return _user.voteAvg + _user.voteAvg;
+      return _user.voteUp + _user.voteUp;
     });
     setRankDesc([...tabulatedUsers]);
-    tabulatedUsers.sort(function (_user) {
-      return _user.voteAvg + _user.voteAvg;
-    });
-    setRankAsc([...tabulatedUsers]);
   };
 
   useEffect(() => {
