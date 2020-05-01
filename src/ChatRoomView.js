@@ -133,7 +133,7 @@ const ChatRoomView = (props) => {
                   </h3>
                 )}
                 {connectedUsers.length === 1 ? (
-                  <h3 style={{ color: "red" }}>Finding Someone To Join...</h3>
+                  <h3 style={{ color: "green" }}>Finding Someone To Join...</h3>
                 ) : (
                   ""
                 )}
