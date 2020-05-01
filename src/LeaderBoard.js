@@ -1,3 +1,4 @@
+/* eslint-disable use-isnan */
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -8,8 +9,6 @@ const LeaderBoard = ({ user, goHome }) => {
   const [rankDesc, setRankDesc] = useState([]);
   const [rankAsc, setRankAsc] = useState([]);
 
-  //3) create array of  get num of up/down votes
-  //   this is a super expensive operation
   const tabulateVotes = () => {
     const temp = allUsers.map(async (_user) => {
       _user.voteUp = 0;
@@ -21,36 +20,33 @@ const LeaderBoard = ({ user, goHome }) => {
         if (vote.voteDirection === "up") {
           _user.voteUp++;
         } else {
-          _user.voteDown--;
+          _user.voteDown++;
         }
       });
-      console.log(_user.voteDown);
-      console.log(_user.voteUp);
-      console.log(_user.voteCount);
-      _user.voteAvg = (_user.voteDown + _user.voteUp) / _user.voteCount;
+      _user.voteAvg = (_user.voteUp - _user.voteDown) / _user.voteCount;
+      if (_user.voteAvg === NaN) {
+        _user.voteAvg = 0;
+      }
       return _user;
     });
     Promise.all(temp).then((values) => setTabulatedUsers(values));
   };
 
   const rankUsers = () => {
-    const sorted = tabulatedUsers;
-    sorted.sort((_user) => {
+    tabulatedUsers.sort(function (_user) {
       return _user.voteAvg + _user.voteAvg;
     });
-    setRankDesc(sorted);
-    sorted.sort((_user) => {
+    setRankDesc([...tabulatedUsers]);
+    tabulatedUsers.sort(function (_user) {
       return _user.voteAvg + _user.voteAvg;
     });
-    setRankAsc(sorted);
+    setRankAsc([...tabulatedUsers])
   };
 
-  //1) get all the users
   useEffect(() => {
     axios.get("/api/users").then((users) => setAllUsers(users.data));
   }, []);
 
-  //2) calltabulate when all the users are here
   useEffect(() => {
     tabulateVotes();
   }, [allUsers]);
@@ -89,28 +85,26 @@ const LeaderBoard = ({ user, goHome }) => {
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <a className="nav-link" href="#/chat">
-                Chat <span className="sr-only">(current)</span>
-              </a>
-            </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/chat">
+                Chat
+              </Link>
+            </li>
+            <li className="nav-item active">
               <Link className="nav-link" to="/leaderboard">
-                {/* Need to change the href here once we have voting up */}
                 Leaderboards
               </Link>
             </li>
           </ul>
           <form className="form-inline my-2 my-lg-0">
             Welcome&nbsp;
-            <a className="mr-3" href="#/chat">
+            <Link className="mr-3" href="/chat">
               {user.userName}
-            </a>
+            </Link>
             <button
               className="btn-md btn-outline-dark my-2 my-sm-0"
               type="button"
-              onClick={() => goHome()}
-            >
+              onClick={() => goHome()}>
               Logout
             </button>
           </form>
@@ -119,27 +113,31 @@ const LeaderBoard = ({ user, goHome }) => {
       <div className="row h-100">
         <div className="my-auto col-sm-12 mx-auto my-auto justify-content-center text-center h-100 mh-100">
           <table className="table">
-            <tr>
-              <th>Users ranked in descending order</th>
-            </tr>
-            <tr>
-              <th>User</th>
-              <th>Total Votes</th>
-              <th>Total of Up Votes</th>
-              <th>Total of Down Votes</th>
-              <th>Vote Average</th>
-            </tr>
-            {rankDesc.map((_user) => {
-              return (
-                <tr key={_user.userName}>
-                  <td>{_user.userName}</td>
-                  <td>{_user.voteCount}</td>
-                  <td>{_user.voteUp}</td>
-                  <td>{_user.voteDown}</td>
-                  <td>{_user.voteAvg}</td>
-                </tr>
-              );
-            })}
+            <thead>
+              <tr>
+                <th>Users starting with the best!</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>User</th>
+                <th>Total Votes</th>
+                <th>Total of Up Votes</th>
+                <th>Total of Down Votes</th>
+                <th>Vote Average</th>
+              </tr>
+              {rankDesc.map((_user) => {
+                return (
+                  <tr key={_user.userName}>
+                    <td>{_user.userName}</td>
+                    <td>{_user.voteCount}</td>
+                    <td>{_user.voteUp}</td>
+                    <td>{_user.voteDown}</td>
+                    <td>{_user.voteAvg}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
       </div>
