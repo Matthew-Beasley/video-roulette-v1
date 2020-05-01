@@ -148,8 +148,7 @@ const ChatRoomView = (props) => {
                   connectedUsers.length < 2
                     ? "d-none col-sm-7 h-100 mh-100"
                     : "col-sm-7 h-100 mh-100"
-                }
-              >
+                }>
                 <div id="videoContainer" className="row h-auto">
                   <div
                     id="subscriber"
@@ -168,8 +167,7 @@ const ChatRoomView = (props) => {
                     connectedUsers.length < 2
                       ? "d-none col-sm-12 mh-50 h-100"
                       : "col-sm-12 mh-50 h-100"
-                  }
-                >
+                  }>
                   <Vote connectedUsers={connectedUsers} user={user} />
                   <br />
                   <div className="row">
