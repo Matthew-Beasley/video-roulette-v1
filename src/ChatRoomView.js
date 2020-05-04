@@ -1,7 +1,6 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
 import Vote from "./Vote";
 import LeaderBoard from "./LeaderBoard";
 
@@ -56,14 +55,8 @@ const ChatRoomView = (props) => {
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <Link className="nav-link" to="/chat">
-                Chat <span className="sr-only">(current)</span>
-              </Link>
-            </li>
             <li className="nav-item">
-              <div className="nav-link" onClick={() => setIsModalOpen(true)}>
-                {/* Need to change the href here once we have voting up */}
+              <div onClick={() => setIsModalOpen(true)}>
                 Leaderboards
               </div>
             </li>

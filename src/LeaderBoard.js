@@ -22,7 +22,7 @@ const LeaderBoard = () => {
           _user.voteDown++;
         }
       });
-      _user.voteAvg = (_user.voteUp - _user.voteDown) / _user.voteCount;
+      _user.voteAvg = ((_user.voteUp - _user.voteDown) / _user.voteCount) * 100;
       if (isNaN(_user.voteAvg)) {
         _user.voteAvg = 0;
       }
@@ -75,7 +75,7 @@ const LeaderBoard = () => {
                     <td>{_user.voteCount}</td>
                     <td>{_user.voteUp}</td>
                     <td>{_user.voteDown}</td>
-                    <td>{_user.voteAvg}</td>
+                    <td>{Math.round(_user.voteAvg * 100) / 100}%</td>
                   </tr>
                 );
               })}
