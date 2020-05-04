@@ -7,7 +7,6 @@ const LeaderBoard = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [tabulatedUsers, setTabulatedUsers] = useState([]);
   const [rankDesc, setRankDesc] = useState([]);
-  const [rankAsc, setRankAsc] = useState([]);
 
   const tabulateVotes = () => {
     const temp = allUsers.map(async (_user) => {
