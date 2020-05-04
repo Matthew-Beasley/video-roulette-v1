@@ -1,6 +1,8 @@
-import React from "react";
+/* eslint-disable react/button-has-type */
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Vote from "./Vote";
+import LeaderBoard from "./LeaderBoard";
 
 const ChatRoomView = (props) => {
   const {
@@ -20,6 +22,7 @@ const ChatRoomView = (props) => {
     setMessage,
     message,
   } = props;
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="h-100">
@@ -57,7 +60,7 @@ const ChatRoomView = (props) => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/leaderboard">
+              <Link className="nav-link" onClick={() => setIsModalOpen(true)}>
                 {/* Need to change the href here once we have voting up */}
                 Leaderboards
               </Link>
@@ -78,6 +81,14 @@ const ChatRoomView = (props) => {
           </form>
         </div>
       </nav>
+      {isModalOpen && (
+        <div>
+          <button onClick={() => setIsModalOpen(false)}>
+            Close Leader Board
+          </button>
+          <LeaderBoard />
+        </div>
+      )}
       <div id="partyButtons">
         <div className="row h-100">
           <div className="my-auto col-sm-12">
@@ -148,7 +159,8 @@ const ChatRoomView = (props) => {
                   connectedUsers.length < 2
                     ? "d-none col-sm-7 h-100 mh-100"
                     : "col-sm-7 h-100 mh-100"
-                }>
+                }
+              >
                 <div id="videoContainer" className="row h-auto">
                   <div
                     id="subscriber"
@@ -167,7 +179,8 @@ const ChatRoomView = (props) => {
                     connectedUsers.length < 2
                       ? "d-none col-sm-12 mh-50 h-100"
                       : "col-sm-12 mh-50 h-100"
-                  }>
+                  }
+                >
                   <Vote connectedUsers={connectedUsers} user={user} />
                   <br />
                   <div className="row">
