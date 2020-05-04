@@ -1,7 +1,6 @@
 /* eslint-disable react/self-closing-comp */
 /* eslint-disable react/button-has-type */
 import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
 import { Route, Redirect, Link, useHistory } from "react-router-dom";
 import ChatRoom from "./ChatRoom";
 import Login from "./Login";

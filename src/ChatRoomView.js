@@ -1,6 +1,7 @@
 /* eslint-disable react/button-has-type */
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 import Vote from "./Vote";
 import LeaderBoard from "./LeaderBoard";
 
@@ -22,6 +23,7 @@ const ChatRoomView = (props) => {
     setMessage,
     message,
   } = props;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -60,10 +62,10 @@ const ChatRoomView = (props) => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" onClick={() => setIsModalOpen(true)}>
+              <div className="nav-link" onClick={() => setIsModalOpen(true)}>
                 {/* Need to change the href here once we have voting up */}
                 Leaderboards
-              </Link>
+              </div>
             </li>
           </ul>
           <form className="form-inline my-2 my-lg-0">
@@ -82,12 +84,12 @@ const ChatRoomView = (props) => {
         </div>
       </nav>
       {isModalOpen && (
-        <div>
-          <button onClick={() => setIsModalOpen(false)}>
-            Close Leader Board
-          </button>
-          <LeaderBoard />
-        </div>
+      <div>
+        <button onClick={() => setIsModalOpen(false)}>
+          Close Leader Board
+        </button>
+        <LeaderBoard />
+      </div>
       )}
       <div id="partyButtons">
         <div className="row h-100">
