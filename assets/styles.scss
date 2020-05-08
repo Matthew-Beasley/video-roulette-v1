@@ -38,12 +38,22 @@ li {
   max-height: 550px;
 }
 
+#subscriber {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 #bottomCorner {
   position: absolute;
   top: 0;
   left: 0;
   width: 160px;
   height: 101px;
+}
+
+.nav-item {
+  margin: 0rem 1rem 0rem 1rem;
 }
 
 #subscriber {

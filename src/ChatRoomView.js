@@ -56,6 +56,11 @@ const ChatRoomView = (props) => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto">
             <li className="nav-item">
+              <div onClick={() => setIsModalOpen(false)}>
+                Chat
+              </div>
+            </li>
+            <li className="nav-item">
               <div onClick={() => setIsModalOpen(true)}>
                 Leaderboards
               </div>
@@ -78,9 +83,6 @@ const ChatRoomView = (props) => {
       </nav>
       {isModalOpen && (
       <div>
-        <button onClick={() => setIsModalOpen(false)}>
-          Close Leader Board
-        </button>
         <LeaderBoard />
       </div>
       )}
@@ -131,7 +133,7 @@ const ChatRoomView = (props) => {
                   3. Wait For Someone To Join!
                   <br />
                   <br />
-                  &#x28;Remember To Downvote The Dinguses&#x29;
+                  &#x28;Remember To Upvote the Rock Stars&#x29;
                 </h2>
                 {connectionIsLoading && (
                   <h3 style={{ color: "red" }}>

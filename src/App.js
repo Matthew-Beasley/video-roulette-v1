@@ -60,7 +60,6 @@ const App = () => {
           render={() => <CreateUsername logout={logout} history={history} />}
         />
         <Route path="/login" render={() => <Login login={login} />} />
-        <Route path="/leaderboard" render={() => <LeaderBoard user={user} />} />
       </div>
     );
   }

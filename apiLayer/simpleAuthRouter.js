@@ -37,6 +37,8 @@ simpleAuthRouter.use((req, res, next) => {
     });
 });
 
+// This is the only method used in this file
+// called from line 21 app.js
 simpleAuthRouter.post("/", (req, res, next) => {
   authenticate(req.body)
     .then((token) => res.send({ token }))
